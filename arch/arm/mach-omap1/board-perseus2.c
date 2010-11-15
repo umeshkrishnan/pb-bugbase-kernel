@@ -20,20 +20,20 @@
 #include <linux/mtd/partitions.h>
 #include <linux/input.h>
 
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 #include <asm/mach-types.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/flash.h>
 #include <asm/mach/map.h>
 
-#include <mach/tc.h>
-#include <mach/gpio.h>
-#include <mach/mux.h>
-#include <mach/fpga.h>
-#include <mach/nand.h>
-#include <mach/keypad.h>
-#include <mach/common.h>
-#include <mach/board.h>
+#include <plat/tc.h>
+#include <plat/gpio.h>
+#include <plat/mux.h>
+#include <plat/fpga.h>
+#include <plat/nand.h>
+#include <plat/keypad.h>
+#include <plat/common.h>
+#include <plat/board.h>
 
 static int p2_keymap[] = {
 	KEY(0,0,KEY_UP),

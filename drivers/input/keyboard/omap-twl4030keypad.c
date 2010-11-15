@@ -38,7 +38,7 @@
 #include <linux/i2c.h>
 #include <linux/i2c/twl4030.h>
 #include <linux/irq.h>
-#include <mach/keypad.h>
+#include <plat/keypad.h>
 
 #include "twl4030-keypad.h"
 

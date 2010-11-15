@@ -19,10 +19,10 @@
 #include <linux/mmc/host.h>
 #include <linux/regulator/consumer.h>
 
-#include <mach/hardware.h>
-#include <mach/control.h>
-#include <mach/mmc.h>
-#include <mach/board.h>
+#include <plat/hardware.h>
+#include <plat/control.h>
+#include <plat/mmc.h>
+#include <plat/board.h>
 
 #include "mmc-twl4030.h"
 
@@ -204,7 +204,7 @@ static int twl_mmc_resume(struct device *dev, int slot)
 static int twl_mmc1_set_power(struct device *dev, int slot, int power_on,
 				int vdd)
 {
-	u32 reg;
+	u32 reg, prog_io;
 	int ret = 0;
 	struct twl_mmc_controller *c = &hsmmc[0];
 	struct omap_mmc_platform_data *mmc = dev->platform_data;
@@ -236,7 +236,14 @@ static int twl_mmc1_set_power(struct device *dev, int slot, int power_on,
 		}
 
 		reg = omap_ctrl_readl(control_pbias_offset);
-		reg |= OMAP2_PBIASSPEEDCTRL0;
+		if (cpu_is_omap3630()) {
+			/* Set MMC I/O to 52Mhz */
+			prog_io = omap_ctrl_readl(OMAP343X_CONTROL_PROG_IO1);
+			prog_io |= OMAP3630_PRG_SDMMC1_SPEEDCTRL;
+			omap_ctrl_writel(prog_io, OMAP343X_CONTROL_PROG_IO1);
+		} else {
+			reg |= OMAP2_PBIASSPEEDCTRL0;
+		}
 		reg &= ~OMAP2_PBIASLITEPWRDNZ0;
 		omap_ctrl_writel(reg, control_pbias_offset);
 
@@ -433,6 +440,11 @@ void __init twl4030_mmc_init(struct twl4030_hsmmc_info *controllers)
 		case 1:
 			/* on-chip level shifting via PBIAS0/PBIAS1 */
 			mmc->slots[0].set_power = twl_mmc1_set_power;
+			/* Omap3630 HSMMC1 supports only 4-bit */
+			if (cpu_is_omap3630() && c->wires > 4) {
+			c->wires = 4;
+			mmc->slots[0].wires = c->wires;
+			}
 			break;
 		case 2:
 			if (c->ext_clock)

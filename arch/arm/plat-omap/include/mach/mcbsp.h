@@ -27,8 +27,8 @@
 #include <linux/completion.h>
 #include <linux/spinlock.h>
 
-#include <mach/hardware.h>
-#include <mach/clock.h>
+#include <plat/hardware.h>
+#include <plat/clock.h>
 
 #define OMAP730_MCBSP1_BASE	0xfffb1000
 #define OMAP730_MCBSP2_BASE	0xfffb1800

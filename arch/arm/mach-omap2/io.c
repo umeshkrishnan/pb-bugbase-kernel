@@ -22,30 +22,30 @@
 #include <linux/init.h>
 #include <linux/io.h>
 #include <linux/clk.h>
+#include <linux/omapfb.h>
 
 #include <asm/tlb.h>
 
 #include <asm/mach/map.h>
 
-#include <mach/mux.h>
-#include <mach/omapfb.h>
-#include <mach/sram.h>
-#include <mach/sdrc.h>
-#include <mach/gpmc.h>
-#include <mach/serial.h>
-#include <mach/vram.h>
+#include <plat/mux.h>
+#include <plat/sram.h>
+#include <plat/sdrc.h>
+#include <plat/gpmc.h>
+#include <plat/serial.h>
+#include <plat/mux.h>
+#include <plat/vram.h>
 
-#ifndef CONFIG_ARCH_OMAP4	/* FIXME: Remove this once clkdev is ready */
 #include "clock.h"
 
-#include <mach/omap-pm.h>
-#include <mach/powerdomain.h>
+#include <plat/omap-pm.h>
+#include <plat/powerdomain.h>
 #include "powerdomains.h"
 
-#include <mach/clockdomain.h>
+#include <plat/clockdomain.h>
 #include "clockdomains.h"
-#endif
-#include <mach/omap_hwmod.h>
+#include <plat/omap_hwmod.h>
+
 #include "omap_hwmod_2420.h"
 #include "omap_hwmod_2430.h"
 #include "omap_hwmod_34xx.h"
@@ -204,6 +204,24 @@ static struct map_desc omap44xx_io_desc[] __initdata = {
 		.type		= MT_DEVICE,
 	},
 	{
+		.virtual	= OMAP44XX_EMIF1_VIRT,
+		.pfn		= __phys_to_pfn(OMAP44XX_EMIF1_PHYS),
+		.length		= OMAP44XX_EMIF1_SIZE,
+		.type		= MT_DEVICE,
+	},
+	{
+		.virtual	= OMAP44XX_EMIF2_VIRT,
+		.pfn		= __phys_to_pfn(OMAP44XX_EMIF2_PHYS),
+		.length		= OMAP44XX_EMIF2_SIZE,
+		.type		= MT_DEVICE,
+	},
+	{
+		.virtual	= OMAP44XX_DMM_VIRT,
+		.pfn		= __phys_to_pfn(OMAP44XX_DMM_PHYS),
+		.length		= OMAP44XX_DMM_SIZE,
+		.type		= MT_DEVICE,
+	},
+	{
 		.virtual	= L4_PER_44XX_VIRT,
 		.pfn		= __phys_to_pfn(L4_PER_44XX_PHYS),
 		.length		= L4_PER_44XX_SIZE,
@@ -285,7 +303,10 @@ static int __init _omap2_init_reprogram_sdrc(void)
 }
 
 void __init omap2_init_common_hw(struct omap_sdrc_params *sdrc_cs0,
-				 struct omap_sdrc_params *sdrc_cs1)
+				 struct omap_sdrc_params *sdrc_cs1,
+				 struct omap_opp *mpu_opps,
+				 struct omap_opp *dsp_opps,
+				 struct omap_opp *l3_opps)
 {
 	struct omap_hwmod **hwmods = NULL;
 
@@ -303,12 +324,16 @@ void __init omap2_init_common_hw(struct omap_sdrc_params *sdrc_cs0,
 	omap_pm_if_early_init(mpu_opps, dsp_opps, l3_opps);
 	pwrdm_init(powerdomains_omap);
 	clkdm_init(clockdomains_omap, clkdm_pwrdm_autodeps);
+#endif
 	omap2_clk_init();
 	omap_serial_early_init();
+#ifndef CONFIG_ARCH_OMAP4
 	omap_hwmod_late_init();
 	omap_pm_if_init();
-	omap2_sdrc_init(sdrc_cs0, sdrc_cs1);
-	_omap2_init_reprogram_sdrc();
+	if (!cpu_is_omap3505() && !cpu_is_omap3517()) {
+		omap2_sdrc_init(sdrc_cs0, sdrc_cs1);
+		_omap2_init_reprogram_sdrc();
+	}
 #endif
 	gpmc_init();
 }

@@ -26,7 +26,7 @@
 #include <linux/io.h>
 #include <linux/kernel.h>
 #include <linux/platform_device.h>
-#include <linux/i2c/twl4030.h>
+#include <linux/i2c/twl.h>
 #include <linux/regulator/machine.h>
 
 #include <linux/mtd/mtd.h>
@@ -38,15 +38,15 @@
 #include <asm/mach/flash.h>
 #include <asm/mach/map.h>
 
-#include <mach/board.h>
-#include <mach/common.h>
-#include <mach/gpio.h>
-#include <mach/gpmc.h>
-#include <mach/hardware.h>
-#include <mach/nand.h>
-#include <mach/mux.h>
-#include <mach/usb.h>
+#include <plat/board.h>
+#include <plat/common.h>
+#include <plat/gpio.h>
+#include <plat/gpmc.h>
+#include <plat/hardware.h>
+#include <plat/nand.h>
+#include <plat/usb.h>
 
+#include "mux.h"
 #include "sdram-micron-mt46h32m32lf-6.h"
 #include "mmc-twl4030.h"
 
@@ -67,7 +67,7 @@
 #if defined(CONFIG_TOUCHSCREEN_ADS7846) || \
 	defined(CONFIG_TOUCHSCREEN_ADS7846_MODULE)
 
-#include <mach/mcspi.h>
+#include <plat/mcspi.h>
 #include <linux/spi/spi.h>
 #include <linux/spi/ads7846.h>
 
@@ -329,6 +329,15 @@ static struct regulator_init_data overo_vmmc1 = {
 	.consumer_supplies	= &overo_vmmc1_supply,
 };
 
+static struct twl4030_codec_audio_data overo_audio_data = {
+	.audio_mclk = 26000000,
+};
+
+static struct twl4030_codec_data overo_codec_data = {
+	.audio_mclk = 26000000,
+	.audio = &overo_audio_data,
+};
+
 /* mmc2 (WLAN) and Bluetooth don't use twl4030 regulators */
 
 static struct twl4030_platform_data overo_twldata = {
@@ -336,6 +345,7 @@ static struct twl4030_platform_data overo_twldata = {
 	.irq_end	= TWL4030_IRQ_END,
 	.gpio		= &overo_gpio_data,
 	.usb		= &overo_usb_data,
+	.codec		= &overo_codec_data,
 	.vmmc1		= &overo_vmmc1,
 };
 
@@ -375,7 +385,7 @@ static void __init overo_init_irq(void)
 	omap_board_config = overo_config;
 	omap_board_config_size = ARRAY_SIZE(overo_config);
 	omap2_init_common_hw(mt46h32m32lf6_sdrc_params,
-			     mt46h32m32lf6_sdrc_params);
+			     mt46h32m32lf6_sdrc_params, NULL, NULL, NULL);
 	omap_init_irq();
 	omap_gpio_init();
 }
@@ -457,7 +467,7 @@ static void __init overo_map_io(void)
 
 MACHINE_START(OVERO, "Gumstix Overo")
 	.phys_io	= 0x48000000,
-	.io_pg_offst	= ((0xd8000000) >> 18) & 0xfffc,
+	.io_pg_offst	= ((0xfa000000) >> 18) & 0xfffc,
 	.boot_params	= 0x80000100,
 	.map_io		= overo_map_io,
 	.init_irq	= overo_init_irq,

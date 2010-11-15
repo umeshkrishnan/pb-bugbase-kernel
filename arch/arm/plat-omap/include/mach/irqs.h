@@ -561,6 +561,6 @@ extern void omap_init_irq(void);
 extern int omap_irq_pending(void);
 #endif
 
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 
 #endif

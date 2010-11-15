@@ -25,9 +25,9 @@
 #include <linux/fb.h>
 #include <linux/backlight.h>
 
-#include <mach/hardware.h>
-#include <mach/board.h>
-#include <mach/mux.h>
+#include <plat/hardware.h>
+#include <plat/board.h>
+#include <plat/mux.h>
 
 #define OMAPBL_MAX_INTENSITY		0xff
 

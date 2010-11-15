@@ -46,7 +46,7 @@
 #include <linux/io.h>
 
 #include <asm/system.h>
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 #include <asm/leds.h>
 #include <asm/irq.h>
 #include <asm/mach/irq.h>

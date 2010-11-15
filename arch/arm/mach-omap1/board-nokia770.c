@@ -20,23 +20,23 @@
 #include <linux/workqueue.h>
 #include <linux/delay.h>
 
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 #include <asm/mach-types.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
 
-#include <mach/gpio.h>
-#include <mach/mux.h>
-#include <mach/usb.h>
-#include <mach/board.h>
-#include <mach/keypad.h>
-#include <mach/common.h>
-#include <mach/dsp_common.h>
-#include <mach/omapfb.h>
-#include <mach/hwa742.h>
-#include <mach/lcd_mipid.h>
-#include <mach/mmc.h>
-#include <mach/clock.h>
+#include <plat/gpio.h>
+#include <plat/mux.h>
+#include <plat/usb.h>
+#include <plat/board.h>
+#include <plat/keypad.h>
+#include <plat/common.h>
+#include <plat/dsp_common.h>
+#include <plat/omapfb.h>
+#include <plat/hwa742.h>
+#include <plat/lcd_mipid.h>
+#include <plat/mmc.h>
+#include <plat/clock.h>
 
 #define ADS7846_PENDOWN_GPIO	15
 

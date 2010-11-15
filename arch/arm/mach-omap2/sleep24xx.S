@@ -27,9 +27,9 @@
 
 #include <linux/linkage.h>
 #include <asm/assembler.h>
-#include <mach/io.h>
+#include <plat/io.h>
 
-#include <mach/omap24xx.h>
+#include <plat/omap24xx.h>
 
 #include "sdrc.h"
 

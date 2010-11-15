@@ -31,20 +31,20 @@
 #include <linux/bmi/omap_bmi.h>
 #include <linux/leds_pwm.h>
 
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 #include <asm/mach-types.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
 
-#include <mach/gpio.h>
-#include <mach/keypad.h>
-#include <mach/board.h>
-#include <mach/usb.h>
-#include <mach/common.h>
-#include <mach/mcspi.h>
-#include <mach/mux.h>
-#include <mach/display.h>
-#include <mach/clock.h>
+#include <plat/gpio.h>
+#include <plat/keypad.h>
+#include <plat/board.h>
+#include <plat/usb.h>
+#include <plat/common.h>
+#include <plat/mcspi.h>
+#include <plat/mux.h>
+#include <plat/display.h>
+#include <plat/clock.h>
 
 #include "sdram-micron-mt46h32m32lf-6.h"
 #include "twl4030-generic-scripts.h"
@@ -275,7 +275,7 @@ static int __init omap3_bug_i2c_init(void)
 	return 0;
 }
 
-
+#if 0
 /*
  * For new frame buffer driver based on DSS2 library
  */
@@ -295,7 +295,7 @@ static struct platform_device omap3bug_vout_device = {
 	.resource 		= &omap3bug_vout_resource[0],
 	.id		        = -1,
 };
-
+#endif
 
 #define LCD_PANEL_LR		2
 #define LCD_PANEL_UD		3
@@ -311,7 +311,7 @@ static struct platform_device omap3bug_vout_device = {
 #define ENABLE_VDAC_DEV_GRP	0x20
 #define ENABLE_VPLL2_DEDICATED	0x05
 #define ENABLE_VPLL2_DEV_GRP	0xE0
-
+#if 0
 static void __init omap3_bug_display_init(void)
 {
 	int r;
@@ -591,14 +591,16 @@ static struct platform_device omap3_bug_pwm_b = {
   .name = "twl4030_pwm",
   .id = 1,
 };
-
+#endif
 static void __init omap3_bug_init_irq(void)
 {
-  omap2_init_common_hw(mt46h32m32lf6_sdrc_params, NULL);
+  omap2_init_common_hw(mt46h32m32lf6_sdrc_params,
+		  	NULL, NULL, NULL, NULL);
   omap_init_irq();
   omap_gpio_init();
 }
 
+#if 0
 /*
  * On/Off LEDs available on OMAP.
  */
@@ -782,7 +784,7 @@ static struct platform_device *omap3_bug_devices[] __initdata = {
 	&leds_gpio
 };
 
-
+#endif
 static struct twl4030_hsmmc_info mmc[] __initdata = {
 	{
 		.mmc		= 1,
@@ -855,7 +857,7 @@ static int omap3bug_spi_uart_gpio_setup(struct spi_device *spi, unsigned gpio, u
 	int r;
   
 	printk(KERN_INFO "spi_uart_gpio: Setting up gpios...\n");
-	omap3_bug_display_init();
+//	omap3_bug_display_init();
 	r =   gpio_request(gpio + 4, "wifi_en");  
 	if (r) {
 	  printk(KERN_ERR "spi_uart_gpio: failed to get wifi_en...\n");
@@ -985,7 +987,7 @@ void gen_gpio_settings(void)
   return;
   
 }
-
+#if 0
 static struct ehci_hcd_omap_platform_data ehci_pdata __initconst = {
 
 	.port_mode[0] = EHCI_HCD_OMAP_MODE_UNKNOWN,
@@ -998,7 +1000,7 @@ static struct ehci_hcd_omap_platform_data ehci_pdata __initconst = {
 	.reset_gpio_port[1]  = 126,
 	.reset_gpio_port[2]  = -EINVAL
 };
-
+#endif
 
 static void __init omap3_bug_init(void)
 {
@@ -1011,18 +1013,18 @@ static void __init omap3_bug_init(void)
 	spi_register_board_info(omap3bug_spi_board_info,
 				ARRAY_SIZE(omap3bug_spi_board_info));
 	omap_serial_init();
-	platform_add_devices(omap3_bug_devices, ARRAY_SIZE(omap3_bug_devices));
+//	platform_add_devices(omap3_bug_devices, ARRAY_SIZE(omap3_bug_devices));
 	//omap_init_twl4030();
-	usb_gpio_settings();
-	usb_musb_init();
-	usb_ehci_init(&ehci_pdata);
-	gen_gpio_settings();
+//	usb_gpio_settings();
+//	usb_musb_init();
+//	usb_ehci_init(&ehci_pdata);
+//	gen_gpio_settings();
 	omap3bug_flash_init();
-	omap_init_bmi_slots();
+//	omap_init_bmi_slots();
 
 	/* Pin Mux - Set T8 to GPT9_PWM_EVT */
 	// For LED - should probably be moved into uboot
-	omap_cfg_reg(T8_34XX_GPIO55_OUT);
+//	omap_cfg_reg(T8_34XX_GPIO55_OUT);
 
 }
 
@@ -1036,7 +1038,7 @@ static void __init omap3_bug_map_io(void)
 MACHINE_START(OMAP3EVM, "OMAP3 BUG")
 	/* Maintainer: Matt Isaacs - BugLabs, inc */
 	.phys_io	= 0x48000000,
-	.io_pg_offst	= ((0xd8000000) >> 18) & 0xfffc,
+	.io_pg_offst	= ((0xfa000000) >> 18) & 0xfffc,
 	.boot_params	= 0x80000100,
 	.map_io		= omap3_bug_map_io,
 	.init_irq	= omap3_bug_init_irq,

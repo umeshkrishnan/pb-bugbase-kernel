@@ -18,10 +18,10 @@
 #include <linux/io.h>
 
 #include <asm/mach/flash.h>
-#include <mach/onenand.h>
-#include <mach/board.h>
-#include <mach/gpmc.h>
-#include <mach/nand.h>
+#include <plat/onenand.h>
+#include <plat/board.h>
+#include <plat/gpmc.h>
+#include <plat/nand.h>
 
 #define ONENAND_MAP		0x20000000
 #define GPMC_CS0_BASE  0x60

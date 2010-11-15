@@ -24,20 +24,20 @@
 #include <linux/mtd/partitions.h>
 #include <linux/input.h>
 
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 #include <asm/mach-types.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/flash.h>
 #include <asm/mach/map.h>
 
-#include <mach/mux.h>
-#include <mach/fpga.h>
-#include <mach/gpio.h>
-#include <mach/tc.h>
-#include <mach/usb.h>
-#include <mach/keypad.h>
-#include <mach/common.h>
-#include <mach/mmc.h>
+#include <plat/mux.h>
+#include <plat/fpga.h>
+#include <plat/gpio.h>
+#include <plat/tc.h>
+#include <plat/usb.h>
+#include <plat/keypad.h>
+#include <plat/common.h>
+#include <plat/mmc.h>
 
 /* At OMAP1610 Innovator the Ethernet is directly connected to CS1 */
 #define INNOVATOR1610_ETHR_START	0x04000300

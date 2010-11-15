@@ -34,8 +34,8 @@
 #include <linux/io.h>
 
 #include <asm/mach-types.h>
-#include <mach/hardware.h>
-#include <mach/mux.h>
+#include <plat/hardware.h>
+#include <plat/mux.h>
 
 #include "musb_core.h"
 #include "omap2430.h"
