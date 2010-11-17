@@ -581,6 +581,7 @@ static struct platform_device omap3_bug_pwr_switch = {
   .num_resources = ARRAY_SIZE(omap3_bug_pwr_switch_resources),
   .resource = omap3_bug_pwr_switch_resources,
 };
+#endif
 
 static struct platform_device omap3_bug_pwm_a = {
   .name = "twl4030_pwm",
@@ -591,7 +592,7 @@ static struct platform_device omap3_bug_pwm_b = {
   .name = "twl4030_pwm",
   .id = 1,
 };
-#endif
+
 static void __init omap3_bug_init_irq(void)
 {
   omap2_init_common_hw(mt46h32m32lf6_sdrc_params,
@@ -656,7 +657,7 @@ static struct platform_device leds_gpio = {
                .platform_data  = &gpio_led_info,
        },
 };
-
+#endif
 /*
  * PWM LEDs available on TWL.
  */
@@ -697,7 +698,7 @@ static struct platform_device leds_pwm =
                                    .platform_data = &pwm_led_info,
 		},
 };
-
+#if 0
 /*
  * PWM LEDs available on OMAP.
  */
@@ -766,45 +767,44 @@ static struct platform_device omap3_bug_pwm_gpt11 = {
                .platform_data  = &omap_pwm_led_gpt11,
        },
 };
-
+#endif
 
 static struct platform_device *omap3_bug_devices[] __initdata = {
 
-  	&bug_disp_pwr,
-	&omap3_bug_dss_device,
-	&omap3bug_vout_device,
-	&omap3_bug_pwr_switch,
+//	&bug_disp_pwr,
+//	omap3_bug_dss_device,
+//	&omap3bug_vout_device,
+//	&omap3_bug_pwr_switch,
 	&omap3_bug_pwm_a,
 	&omap3_bug_pwm_b,
-	&omap3_bug_pwm_gpt8,
-	&omap3_bug_pwm_gpt9,
-	&omap3_bug_pwm_gpt10,
-	&omap3_bug_pwm_gpt11,
+//	&omap3_bug_pwm_gpt8,
+//	&omap3_bug_pwm_gpt9,
+//	&omap3_bug_pwm_gpt10,
+//	&omap3_bug_pwm_gpt11,
 	&leds_pwm,
-	&leds_gpio
+//	&leds_gpio
 };
 
-#endif
 static struct twl4030_hsmmc_info mmc[] __initdata = {
 	{
 		.mmc		= 1,
 		.wires		= 4,
 		.gpio_cd	= -EINVAL,
-		.gpio_wp	= 63,
+		.gpio_wp	= -EINVAL,
 	},
 	{
-	  .mmc = 2,
-	  .wires = 4,
-	  .gpio_cd	= 170,
+		.mmc 		= 2,
+		.wires 		= 4,
+		.gpio_cd	= 108,
 	  //.gpio_wp	= 63,
-	  .ocr_mask = MMC_VDD_32_33,
+	  	.ocr_mask 	= MMC_VDD_32_33,
 	},
 	{
-	  .mmc = 3,
-	  .wires = 1,
-	  .gpio_cd	= -EINVAL,
-	  .gpio_wp	= -EINVAL,
-	  .ocr_mask = MMC_VDD_165_195 | MMC_VDD_32_33,
+		.mmc 		= 3,
+		.wires 		= 1,
+		.gpio_cd	= -EINVAL,
+		.gpio_wp	= -EINVAL,
+		.ocr_mask 	= MMC_VDD_165_195 | MMC_VDD_32_33,
 	},
 	{}	/* Terminator */
 };
@@ -819,10 +819,12 @@ static int __init omap3bug_twl_gpio_setup(struct device *dev,
        /* Most GPIOs are for USB OTG.  Some are mostly sent to
         * the P2 connector; notably LEDA for the LCD backlight.
         */
+#if 0
 	gpio_request(gpio + 1, "usb_hub");
 	gpio_direction_output(gpio + 1, 1);
 	gpio_free(gpio + 1);
-       return 0;
+#endif
+      	return 0;
 }
 
 static int omap3bug_ioexp_gpio_setup(struct i2c_client *client,
@@ -948,12 +950,12 @@ void usb_gpio_settings(void)
 void gen_gpio_settings(void)
 {
   int r;
-  r =   gpio_request(107, "dock_rst");
+  r =   gpio_request(110, "dock_rst");
   if (r) {
     printk(KERN_ERR "gen_gpio: failed to get dock_rst...\n");
     return;
   }
-  gpio_direction_output(107, 1);
+  gpio_direction_output(110, 1);
 
   r =   gpio_request(42, "spi_uart_rst");
   if (r) {
@@ -974,16 +976,16 @@ void gen_gpio_settings(void)
   if (r) {
     printk(KERN_ERR "gen_gpio: failed to get mmc1_enable...\n");
     return;
-  }
+	}
   gpio_direction_output(35, 1);
-
+#if 0
   r =   gpio_request(108, "audio_mute");
   if (r) {
     printk(KERN_ERR "gen_gpio: failed to get audio_mute...\n");
     return;
   }
   gpio_direction_output(108, 1);
-
+#endif
   return;
   
 }
@@ -1013,12 +1015,12 @@ static void __init omap3_bug_init(void)
 	spi_register_board_info(omap3bug_spi_board_info,
 				ARRAY_SIZE(omap3bug_spi_board_info));
 	omap_serial_init();
-//	platform_add_devices(omap3_bug_devices, ARRAY_SIZE(omap3_bug_devices));
+	platform_add_devices(omap3_bug_devices, ARRAY_SIZE(omap3_bug_devices));
 	//omap_init_twl4030();
 //	usb_gpio_settings();
 //	usb_musb_init();
 //	usb_ehci_init(&ehci_pdata);
-//	gen_gpio_settings();
+	gen_gpio_settings();
 	omap3bug_flash_init();
 //	omap_init_bmi_slots();
 

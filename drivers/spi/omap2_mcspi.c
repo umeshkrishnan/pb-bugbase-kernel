@@ -209,13 +209,13 @@ static void omap2_mcspi_force_cs(struct spi_device *spi, int cs_active)
 
 	index = spi->chip_select - cdata->config->num_cs;
 	//printk(KERN_INFO "force_cs: index: %d\n", index);
-#if 0
+
 	if (index >= 0){
 		printk(KERN_INFO "force_cs: index: %d gpio: %d\n", index, cdata->config->gpio_cs[index]);
 		//gpio_set_value(cdata->config->gpio_cs[index], cs_active);
 		gpio_direction_output(cdata->config->gpio_cs[index], cs_active);
 	}
-#endif
+
 	l = mcspi_read_cs_reg(spi, OMAP2_MCSPI_CHCONF0);
 	MOD_REG_BIT(l, OMAP2_MCSPI_CHCONF_FORCE, cs_active);
 	mcspi_write_cs_reg(spi, OMAP2_MCSPI_CHCONF0, l);
