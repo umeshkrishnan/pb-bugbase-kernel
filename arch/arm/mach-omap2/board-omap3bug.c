@@ -46,6 +46,7 @@
 #include <plat/display.h>
 #include <plat/clock.h>
 
+#include "mux.h"
 #include "sdram-micron-mt46h32m32lf-6.h"
 #include "twl4030-generic-scripts.h"
 #include "mmc-twl4030.h"
@@ -275,7 +276,7 @@ static int __init omap3_bug_i2c_init(void)
 	return 0;
 }
 
-#if 0
+#if 1
 /*
  * For new frame buffer driver based on DSS2 library
  */
@@ -311,7 +312,7 @@ static struct platform_device omap3bug_vout_device = {
 #define ENABLE_VDAC_DEV_GRP	0x20
 #define ENABLE_VPLL2_DEDICATED	0x05
 #define ENABLE_VPLL2_DEV_GRP	0xE0
-#if 0
+#if 1
 static void __init omap3_bug_display_init(void)
 {
 	int r;
@@ -331,14 +332,16 @@ static void __init omap3_bug_display_init(void)
 
 static int omap3_bug_panel_enable_lcd(struct omap_dss_device *display)
 {
-  	omap_cfg_reg (LCD_MCSPI3_CLK);
+
+#if 0
+	omap_cfg_reg (LCD_MCSPI3_CLK);
 	omap_cfg_reg (LCD_MCSPI3_SIMO);
 	omap_cfg_reg (LCD_SHUTDOWN);
 	omap_cfg_reg (LCD_MCSPI3_CS);
 	omap_cfg_reg (ACC_RESET);
 	omap_cfg_reg (LCD_TP_RESET);
 	omap_cfg_reg (ACC_INT);
-
+#endif
 /*
 	gpio_direction_output(VIDEO_PIM_ENABLE, 1);
 	gpio_direction_output(VIDEO_PIM_SW_ENABLE, 0);
@@ -352,7 +355,7 @@ static int omap3_bug_panel_enable_lcd(struct omap_dss_device *display)
 static void omap3_bug_panel_disable_lcd(struct omap_dss_device *display)
 {
 	//gpio_direction_output(VIDEO_PIM_SW_ENABLE, 1);
-
+#if 0
 	// Mux these pins to safe mode
   	omap_cfg_reg (DSS_D18);
 	omap_cfg_reg (DSS_D19);
@@ -361,7 +364,7 @@ static void omap3_bug_panel_disable_lcd(struct omap_dss_device *display)
 	omap_cfg_reg (DSS_D21);
 	omap_cfg_reg (DSS_D22);
 	omap_cfg_reg (DSS_D23);
-
+#endif
 	return;
 }
 
@@ -375,7 +378,7 @@ static struct omap_dss_device omap3_bug_lcd_device = {
 	.platform_enable = omap3_bug_panel_enable_lcd,
 	.platform_disable = omap3_bug_panel_disable_lcd,
 };
-
+#if 0
 static int omap3_bug_panel_enable_dvi(struct omap_dss_device *display)
 {
 	omap_cfg_reg (DSS_DATA_18);
@@ -425,17 +428,17 @@ static struct omap_dss_device omap3_bug_dvi_device = {
 	.platform_enable     = omap3_bug_panel_enable_dvi,
 	.platform_disable    = omap3_bug_panel_disable_dvi,
 };
-
+#endif
 struct omap_dss_device *omap3_bug_display_devices[] = {
         &omap3_bug_lcd_device,
-	&omap3_bug_dvi_device,
-	&omap3_bug_vga_device,
+//	&omap3_bug_dvi_device,
+//	&omap3_bug_vga_device,
 };
 
 static struct omap_dss_board_info omap3_bug_dss_data = {
 	.num_devices	     = ARRAY_SIZE(omap3_bug_display_devices),
 	.devices	     = omap3_bug_display_devices,
-	.default_device	     = &omap3_bug_dvi_device,
+	.default_device	     = &omap3_bug_lcd_device,
 };
 
 static struct platform_device omap3_bug_dss_device = {
@@ -771,10 +774,10 @@ static struct platform_device omap3_bug_pwm_gpt11 = {
 
 static struct platform_device *omap3_bug_devices[] __initdata = {
 
-//	&bug_disp_pwr,
-//	omap3_bug_dss_device,
-//	&omap3bug_vout_device,
-//	&omap3_bug_pwr_switch,
+	&bug_disp_pwr,
+	&omap3_bug_dss_device,
+	&omap3bug_vout_device,
+	&omap3_bug_pwr_switch,
 	&omap3_bug_pwm_a,
 	&omap3_bug_pwm_b,
 //	&omap3_bug_pwm_gpt8,
@@ -859,7 +862,7 @@ static int omap3bug_spi_uart_gpio_setup(struct spi_device *spi, unsigned gpio, u
 	int r;
   
 	printk(KERN_INFO "spi_uart_gpio: Setting up gpios...\n");
-//	omap3_bug_display_init();
+	omap3_bug_display_init();
 	r =   gpio_request(gpio + 4, "wifi_en");  
 	if (r) {
 	  printk(KERN_ERR "spi_uart_gpio: failed to get wifi_en...\n");
@@ -1004,8 +1007,43 @@ static struct ehci_hcd_omap_platform_data ehci_pdata __initconst = {
 };
 #endif
 
+#ifdef CONFIG_OMAP_MUX
+static struct omap_board_mux pb_bugbase_mux[] __initdata = {
+	OMAP3_MUX(DSS_PCLK, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_HSYNC, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_VSYNC, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_ACBIAS, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA0, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA1, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA2, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA3, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA4, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA5, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA6, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA7, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA8, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA9, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA10, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA11, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA12, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA13, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA14, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA15, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA16, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA17, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA18, OMAP_MUX_MODE2 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA19, OMAP_MUX_MODE2 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA20, OMAP_MUX_MODE4 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA21, OMAP_MUX_MODE2 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA22, OMAP_MUX_MODE4 | OMAP_PIN_OUTPUT),
+	OMAP3_MUX(DSS_DATA23, OMAP_MUX_MODE4 | OMAP_PIN_OUTPUT),
+	{ .reg_offset = OMAP_MUX_TERMINATOR },
+};
+#endif
 static void __init omap3_bug_init(void)
 {
+	if (cpu_is_omap3630())
+		omap3_mux_init(pb_bugbase_mux, OMAP_PACKAGE_CBB);
 
 	/* Get BUG board version and save it */
         //omap3bug_board_rev();
@@ -1022,7 +1060,7 @@ static void __init omap3_bug_init(void)
 //	usb_ehci_init(&ehci_pdata);
 	gen_gpio_settings();
 	omap3bug_flash_init();
-//	omap_init_bmi_slots();
+	omap_init_bmi_slots();
 
 	/* Pin Mux - Set T8 to GPT9_PWM_EVT */
 	// For LED - should probably be moved into uboot

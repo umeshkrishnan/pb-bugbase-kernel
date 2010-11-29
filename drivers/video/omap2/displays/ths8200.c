@@ -15,7 +15,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/delay.h>
-#include <mach/gpio.h>
+#include <plat/gpio.h>
 #include <linux/i2c.h>
 #include "ths8200.h"
 

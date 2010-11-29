@@ -19,7 +19,7 @@
 
 #include <linux/module.h>
 #include <linux/delay.h>
-#include <mach/display.h>
+#include <plat/display.h>
 
 static struct omap_video_timings vga_panel_timings = {
 	/* 1024 x 768 @ 60 Hz */     

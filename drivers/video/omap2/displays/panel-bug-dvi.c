@@ -19,7 +19,7 @@
 
 #include <linux/module.h>
 #include <linux/delay.h>
-#include <mach/display.h>
+#include <plat/display.h>
 
 static struct omap_video_timings dvi_panel_timings = {
 	/* 1280 x 1024 @ 60 Hz */

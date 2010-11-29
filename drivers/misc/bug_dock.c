@@ -164,7 +164,7 @@ static int bug_dock_probe(struct platform_device *pdev)
   omap_set_gpio_debounce(DOCK_PRESENCE, 1);
   omap_set_gpio_debounce_time(DOCK_PRESENCE, 0xff);
 
-  omap_cfg_reg(AH19_34XX_GPIO113);
+//  omap_cfg_reg(AH19_34XX_GPIO113);
 
   // request dock presence irq
   err = request_irq(gpio_to_irq(DOCK_PRESENCE), dock_irq_handler,

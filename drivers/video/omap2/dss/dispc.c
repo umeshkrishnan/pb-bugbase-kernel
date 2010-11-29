@@ -32,10 +32,10 @@
 #include <linux/delay.h>
 #include <linux/workqueue.h>
 
-#include <mach/sram.h>
-#include <mach/clock.h>
+#include <plat/sram.h>
+#include <plat/clock.h>
 
-#include <mach/display.h>
+#include <plat/display.h>
 
 #include "dss.h"
 
@@ -2091,7 +2091,9 @@ void dispc_set_parallel_interface_mode(enum omap_parallel_interface_mode mode)
 static bool _dispc_lcd_timings_ok(int hsw, int hfp, int hbp,
 		int vsw, int vfp, int vbp)
 {
-	if (cpu_is_omap24xx() || omap_rev() < OMAP3430_REV_ES3_0) {
+	if (!cpu_is_omap3630() && !cpu_is_omap3517() && !cpu_is_omap3505() &&
+			(cpu_is_omap24xx() ||
+			 (cpu_is_omap34xx() && omap_rev_lt_3_0()))) {
 		if (hsw < 1 || hsw > 64 ||
 				hfp < 1 || hfp > 256 ||
 				hbp < 1 || hbp > 256 ||
@@ -2124,7 +2126,9 @@ static void _dispc_set_lcd_timings(int hsw, int hfp, int hbp,
 {
 	u32 timing_h, timing_v;
 
-	if (cpu_is_omap24xx() || omap_rev() < OMAP3430_REV_ES3_0) {
+	if (!cpu_is_omap3630() && !cpu_is_omap3517() && !cpu_is_omap3505() &&
+			(cpu_is_omap24xx() ||
+			 (cpu_is_omap34xx() && omap_rev_lt_3_0()))) {
 		timing_h = FLD_VAL(hsw-1, 5, 0) | FLD_VAL(hfp-1, 15, 8) |
 			FLD_VAL(hbp-1, 27, 20);
 
@@ -3048,7 +3052,11 @@ static void _omap_dispc_initial_config(void)
 	u32 l;
 
 	l = dispc_read_reg(DISPC_SYSCONFIG);
-	l = FLD_MOD(l, 2, 13, 12);	/* MIDLEMODE: smart standby */
+	if (cpu_is_omap34xx() || cpu_is_omap3630())
+		l = FLD_MOD(l, 0, 13, 12);      /* MIDLEMODE: Force standby */
+	else
+		l = FLD_MOD(l, 2, 13, 12);	/* MIDLEMODE: smart standby */
+
 	l = FLD_MOD(l, 2, 4, 3);	/* SIDLEMODE: smart idle */
 	l = FLD_MOD(l, 1, 2, 2);	/* ENWAKEUP */
 	l = FLD_MOD(l, 1, 0, 0);	/* AUTOIDLE */
@@ -3060,7 +3068,7 @@ static void _omap_dispc_initial_config(void)
 	/* L3 firewall setting: enable access to OCM RAM */
 	/* XXX this should be somewhere in plat-omap */
 	if (cpu_is_omap24xx())
-		__raw_writel(0x402000b0, OMAP2_IO_ADDRESS(0x680050a0));
+		__raw_writel(0x402000b0, OMAP2_L3_IO_ADDRESS(0x680050a0));
 
 	_dispc_setup_color_conv_coef();
 

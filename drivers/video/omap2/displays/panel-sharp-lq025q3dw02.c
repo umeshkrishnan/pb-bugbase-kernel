@@ -13,9 +13,9 @@
 #include <linux/fb.h>
 #include <linux/device.h>
 
-#include <mach/display.h>
-#include <mach/dma.h>
-#include <mach/gpio.h>
+#include <plat/display.h>
+#include <plat/dma.h>
+#include <plat/gpio.h>
 
 static struct omap_video_timings sharp_spi_timings = {
   .x_res = 320,

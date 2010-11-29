@@ -28,8 +28,8 @@
 #include <linux/spinlock.h>
 #include <linux/jiffies.h>
 
-#include <mach/display.h>
-#include <mach/cpu.h>
+#include <plat/display.h>
+#include <plat/cpu.h>
 
 #include "dss.h"
 
