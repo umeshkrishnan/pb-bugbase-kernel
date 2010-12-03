@@ -30,9 +30,11 @@
 
 #define BQ27x00_REG_TEMP		0x06
 #define BQ27x00_REG_VOLT		0x08
-#define BQ27x00_REG_RSOC		0x0B /* Relative State-of-Charge */
-#define BQ27x00_REG_AI			0x14
 #define BQ27x00_REG_FLAGS		0x0A
+#define BQ27x00_REG_AI			0x14
+#define BQ27x00_REG_TTF			0x18
+#define BQ27x00_REG_TTE			0x16
+#define BQ27x00_REG_RSOC		0x2c /* Relative State-of-Charge */
 
 /* If the system has several batteries we need a different name for each
  * of them...
@@ -61,10 +63,13 @@ struct bq27x00_device_info {
 
 static enum power_supply_property bq27x00_battery_props[] = {
 	POWER_SUPPLY_PROP_PRESENT,
-	POWER_SUPPLY_PROP_VOLTAGE_NOW,
-	POWER_SUPPLY_PROP_CURRENT_NOW,
-	POWER_SUPPLY_PROP_CAPACITY,
+	POWER_SUPPLY_PROP_VOLTAGE_AVG,
+	POWER_SUPPLY_PROP_CURRENT_AVG,
+	POWER_SUPPLY_PROP_CAPACITY, /* in percents! */
 	POWER_SUPPLY_PROP_TEMP,
+	POWER_SUPPLY_PROP_TIME_TO_EMPTY_AVG,
+	POWER_SUPPLY_PROP_TIME_TO_FULL_AVG,
+
 };
 
 /*
@@ -97,7 +102,7 @@ static int bq27x00_battery_temperature(struct bq27x00_device_info *di)
 		return ret;
 	}
 
-	return (temp >> 2) - 273;
+	return ((temp / 10 ) - 273);
 }
 
 /*
@@ -123,26 +128,31 @@ static int bq27x00_battery_voltage(struct bq27x00_device_info *di)
  * Note that current can be negative signed as well
  * Or 0 if something fails.
  */
-static int bq27x00_battery_current(struct bq27x00_device_info *di)
+static signed int bq27x00_battery_current(struct bq27x00_device_info *di)
 {
 	int ret;
 	int curr = 0;
 	int flags = 0;
 
 	ret = bq27x00_read(BQ27x00_REG_AI, &curr, 0, di);
+	printk("current = %d\n", curr);
 	if (ret) {
 		dev_err(di->dev, "error reading current\n");
 		return 0;
 	}
+
 	ret = bq27x00_read(BQ27x00_REG_FLAGS, &flags, 0, di);
+	printk("Flags = %x\n", flags);
 	if (ret < 0) {
 		dev_err(di->dev, "error reading flags\n");
 		return 0;
 	}
-	if ((flags & (1 << 7)) != 0) {
+	if ((flags & (1 << 0)) != 0) {
 		dev_dbg(di->dev, "negative current!\n");
-		return -curr;
+		printk("negative current!\n");
+		return -((~curr +1) & 0x00ff);
 	}
+
 	return curr;
 }
 
@@ -150,19 +160,54 @@ static int bq27x00_battery_current(struct bq27x00_device_info *di)
  * Return the battery Relative State-of-Charge
  * Or < 0 if something fails.
  */
-static int bq27x00_battery_rsoc(struct bq27x00_device_info *di)
+static unsigned int bq27x00_battery_rsoc(struct bq27x00_device_info *di)
 {
 	int ret;
-	int rsoc = 0;
+	unsigned int rsoc = 0;
 
 	ret = bq27x00_read(BQ27x00_REG_RSOC, &rsoc, 1, di);
+	printk("SOC = %x\n", rsoc);
 	if (ret) {
 		dev_err(di->dev, "error reading relative State-of-Charge\n");
 		return ret;
 	}
 
-	return rsoc >> 8;
+//	return rsoc >> 8;
+	return rsoc;
 }
+
+static int bq27x00_battery_tte(struct bq27x00_device_info *di)
+{
+	int ret;
+	unsigned int tte = 0;
+
+	ret = bq27x00_read(BQ27x00_REG_TTE, &tte, 1, di);
+	printk("TTE = %x\n", tte);
+	if (ret) {
+		dev_err(di->dev, "error reading Time To Empty\n");
+		return ret;
+	}
+
+//	return rsoc >> 8;
+	return tte;
+}
+
+static int bq27x00_battery_ttf(struct bq27x00_device_info *di)
+{
+	int ret;
+	unsigned int ttf = 0;
+
+	ret = bq27x00_read(BQ27x00_REG_TTF, &ttf, 1, di);
+	printk("TTF = %x\n", ttf);
+	if (ret) {
+		dev_err(di->dev, "error reading Time To Empty\n");
+		return ret;
+	}
+
+//	return rsoc >> 8;
+	return ttf;
+}
+
 
 #define to_bq27x00_device_info(x) container_of((x), \
 				struct bq27x00_device_info, bat);
@@ -174,13 +219,13 @@ static int bq27x00_battery_get_property(struct power_supply *psy,
 	struct bq27x00_device_info *di = to_bq27x00_device_info(psy);
 
 	switch (psp) {
-	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
+	case POWER_SUPPLY_PROP_VOLTAGE_AVG:
 	case POWER_SUPPLY_PROP_PRESENT:
 		val->intval = bq27x00_battery_voltage(di);
 		if (psp == POWER_SUPPLY_PROP_PRESENT)
 			val->intval = val->intval <= 0 ? 0 : 1;
 		break;
-	case POWER_SUPPLY_PROP_CURRENT_NOW:
+	case POWER_SUPPLY_PROP_CURRENT_AVG:
 		val->intval = bq27x00_battery_current(di);
 		break;
 	case POWER_SUPPLY_PROP_CAPACITY:
@@ -188,6 +233,12 @@ static int bq27x00_battery_get_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_TEMP:
 		val->intval = bq27x00_battery_temperature(di);
+		break;
+	case POWER_SUPPLY_PROP_TIME_TO_EMPTY_AVG:
+		val->intval = bq27x00_battery_tte(di);
+		break;
+	case POWER_SUPPLY_PROP_TIME_TO_FULL_AVG:
+		val->intval = bq27x00_battery_ttf(di);
 		break;
 	default:
 		return -EINVAL;
@@ -256,6 +307,7 @@ static int bq27200_battery_probe(struct i2c_client *client,
 	struct bq27x00_access_methods *bus;
 	int num;
 	int retval = 0;
+	int value = 0;
 
 	/* Get new ID for the new battery device */
 	retval = idr_pre_get(&battery_id, GFP_KERNEL);
@@ -298,6 +350,48 @@ static int bq27200_battery_probe(struct i2c_client *client,
 	di->client = client;
 
 	bq27x00_powersupply_init(di);
+
+	/* Read the HW Version */
+	value = i2c_smbus_write_word_data(di->client, 0, 0x0003);
+	if (value < 0)
+		goto batt_failed_3;
+
+	value = i2c_smbus_read_word_data(di->client, 0);
+	if (value < 0)
+		goto batt_failed_3;
+	printk ("HW Version: %#x\n\r", value);
+
+	/* Read the CHEM ID */
+	value = i2c_smbus_write_word_data(di->client, 0, 0x0008);
+	if (value < 0)
+		goto batt_failed_3;
+
+	value = i2c_smbus_read_word_data(di->client, 0);
+	if (value < 0)
+		goto batt_failed_3;
+	printk ("CHEM ID: %#x\n\r", value);
+
+	/* Read the Firmware Version */
+	value = i2c_smbus_write_word_data(di->client, 0, 0x0002);
+	if (value < 0)
+		goto batt_failed_3;
+
+	value = i2c_smbus_read_word_data(di->client, 0);
+	if (value < 0)
+		goto batt_failed_3;
+	printk ("Firmware Version: %#x\n\r", value);
+
+	/* Issue RESET command */
+	if (i2c_smbus_write_word_data(di->client, 0, 0x0041) < 0)
+		goto batt_failed_3;
+
+	mdelay (200);
+
+	/* Perform IT_ENABLE */
+	if (i2c_smbus_write_word_data(di->client, 0, 0x0021) < 0)
+		goto batt_failed_3;
+
+	mdelay (200);
 
 	retval = power_supply_register(&client->dev, &di->bat);
 	if (retval) {
