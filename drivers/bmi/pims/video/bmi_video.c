@@ -32,13 +32,13 @@
 #include <linux/gpio.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 #include <linux/i2c.h>
 #include <linux/i2c/tsc2004.h>
 #include <linux/bmi.h>
 #include <linux/bmi/bmi-slot.h>
 #include <linux/bmi/bmi_lcd.h>
-#include <mach/display.h>
+#include <plat/display.h>
 #include <linux/fb.h>
 #include <linux/list.h>
 #include <linux/slab.h>
