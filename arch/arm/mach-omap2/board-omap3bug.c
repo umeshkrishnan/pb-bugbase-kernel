@@ -464,13 +464,14 @@ static void omap3_bug_panel_disable_dvi(struct omap_dss_device *display)
 	//gpio_direction_output(VIDEO_PIM_SW_ENABLE, 1);
 
 	// Mux these pins to lcd mode
-//	__raw_writew(0x02, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA18_OFFSET);
-//	__raw_writew(0x02, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA19_OFFSET);
-//	__raw_writew(0x02, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA21_OFFSET);
-//	omap_mux_init_gpio(90, OMAP_PIN_OUTPUT);
-//	omap_mux_init_gpio(92, OMAP_PIN_OUTPUT);
-//	omap_mux_init_gpio(93, OMAP_PIN_OUTPUT);
+	__raw_writew(0x02, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA18_OFFSET);
+	__raw_writew(0x02, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA19_OFFSET);
+	__raw_writew(0x02, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA21_OFFSET);
+	omap_mux_init_gpio(90, OMAP_PIN_OUTPUT);
+	omap_mux_init_gpio(92, OMAP_PIN_OUTPUT);
+	omap_mux_init_gpio(93, OMAP_PIN_OUTPUT);
 
+	omap3_bug_display_init();
 	return;
 }
 
@@ -501,7 +502,7 @@ struct omap_dss_device *omap3_bug_display_devices[] = {
 static struct omap_dss_board_info omap3_bug_dss_data = {
 	.num_devices	     = ARRAY_SIZE(omap3_bug_display_devices),
 	.devices	     = omap3_bug_display_devices,
-	.default_device	     = &omap3_bug_dvi_device,
+	.default_device	     = &omap3_bug_lcd_device,
 };
 
 static struct platform_device omap3_bug_dss_device = {
