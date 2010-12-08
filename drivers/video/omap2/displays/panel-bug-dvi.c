@@ -35,7 +35,8 @@ static struct omap_video_timings dvi_panel_timings = {
 	.vsw		= 3,
         */
 
-	/* 1024 x 768 @ 60 Hz */        
+	/* 1024 x 768 @ 60 Hz */
+	/*
   	.x_res		= 1024,
   	.y_res		= 768,
 	.pixel_clock	= 65000,
@@ -45,7 +46,17 @@ static struct omap_video_timings dvi_panel_timings = {
 	.vfp		= 3,
 	.vbp		= 29,
 	.vsw		= 6,
+	*/
 
+  	.x_res		= 1280,
+  	.y_res		= 720,
+	.pixel_clock	= 74250,
+	.hfp		= (0x3F-1),
+	.hbp		= (0x31-1),
+	.hsw		= (0xFF-1),
+	.vfp		= (0x5-1),
+	.vbp		= (0x4-1),
+	.vsw		= (0x14-1),
    	/* 800 x 600 @ 60Hz */
 	/*
   	.x_res		= 800,
