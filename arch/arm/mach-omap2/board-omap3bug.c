@@ -350,7 +350,7 @@ static struct platform_device omap3bug_vout_device = {
 #if 1
 static void __init omap3_bug_display_init(void)
 {
-	int r;
+	int r = 0;
 /*
 	r  = gpio_request(VIDEO_PIM_ENABLE, "lcd_power");
 	r |= gpio_request(VIDEO_PIM_SW_ENABLE, "lcd_level_shifter");
@@ -1014,6 +1014,36 @@ void usb_gpio_settings(void)
 }
 //EXPORT_SYMBOL(usb_gpio_settings);
 
+void batt_gpio_settings(void)
+{
+	int r = 0;
+
+	omap_mux_init_gpio(107, OMAP_PIN_INPUT_PULLUP);
+	omap_mux_init_gpio(164, OMAP_PIN_INPUT_PULLUP);
+	omap_mux_init_gpio(64, OMAP_PIN_INPUT_PULLUP);
+	omap_mux_init_gpio(43, OMAP_PIN_INPUT_PULLUP);
+	omap_mux_init_gpio(96, OMAP_PIN_OUTPUT);
+	omap_mux_init_gpio(111, OMAP_PIN_OUTPUT);
+
+	r |= gpio_request(96, "usb_susp");
+	r |= gpio_request(107, "sw_status");
+	r |= gpio_request(164, "bat_chrg#");
+	r |= gpio_request(64, "bat_low");
+	r |= gpio_request(43, "wall present#");
+	r |= gpio_request(111, "usb_hpwr");
+
+	if (r)
+		printk("*******Gpio request for battery failed\n");
+
+	gpio_direction_output(96, 0);
+	gpio_direction_output(111, 1);
+	gpio_direction_input(107);
+	gpio_direction_input(164);
+	gpio_direction_input(64);
+	gpio_direction_input(43);
+
+
+}
 void gen_gpio_settings(void)
 {
   int r;
@@ -1091,6 +1121,7 @@ static void __init omap3_bug_init(void)
 //	usb_musb_init();
 //	usb_ehci_init(&ehci_pdata);
 	gen_gpio_settings();
+	batt_gpio_settings();
 	omap3bug_flash_init();
 	omap_init_bmi_slots();
 

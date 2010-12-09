@@ -17,17 +17,19 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
+#include <linux/delay.h>
 #include <linux/platform_device.h>
-#include <mach/hardware.h>
-#include <mach/gpio.h>
+#include <plat/hardware.h>
+#include <plat/gpio.h>
 #include <linux/irq.h>
 #include <linux/interrupt.h>
-#include <mach/mux.h>
+#include "../arch/arm/mach-omap2/mux.h"
 #include <linux/bmi.h>
 
 #define USB_RESET        193
 #define DOCK_PRESENCE    113
 
+extern int test_mcbsp (int);
 static DEFINE_MUTEX(count_lock);
 int usb_count;
 
@@ -72,6 +74,43 @@ static ssize_t usb_enable_store(struct device *dev,
 }
 
 static DEVICE_ATTR(usb_enable, 0664, usb_enable_show, usb_enable_store);
+
+static ssize_t store_mcbsp_test (struct device * dev, struct device_attribute * attr,
+		const char * buf, size_t count)
+{ 
+	int val=0;
+	int ret =0;
+	mdelay (10);
+	sscanf (buf, "%d", &val);
+	switch (val)
+	{
+		case 1:
+			ret = test_mcbsp(3);
+			if (ret < 0){
+				printk("McBSP test failed\n");
+				return -EIO;
+			}
+			break;
+		case 3:
+			ret = test_mcbsp(3);
+			if (ret < 0){
+				printk("McBSP test failed\n");
+				return -EIO;
+			}
+			break;
+		case 4:
+			ret = test_mcbsp(4);
+			if (ret < 0){
+				printk("McBSP test failed\n");
+				return -EIO;
+			}
+			break;
+		default:
+			break;
+	}
+	return count;
+}
+static DEVICE_ATTR(mcbsp_test, S_IWUSR, NULL, &store_mcbsp_test);
 
 /**
  *    work queuing
@@ -156,8 +195,11 @@ static int bug_dock_probe(struct platform_device *pdev)
 
   // request control of USB reset
   err =  gpio_request(USB_RESET, "usb_reset");
+  if (err)
+	  printk("*******gpio request failed\n");
   err |= gpio_direction_output(USB_RESET, 1);
   
+  omap_mux_init_gpio(DOCK_PRESENCE, OMAP_PIN_INPUT_PULLUP);
   // request dock presence pin
   err =  gpio_request(DOCK_PRESENCE, "dock_presence");
   err |= gpio_direction_input(DOCK_PRESENCE);
@@ -175,6 +217,10 @@ static int bug_dock_probe(struct platform_device *pdev)
   err = sysfs_create_file(&pdev->dev.kobj, &dev_attr_usb_enable.attr);
   if (err < 0)
     printk(KERN_ERR "Error creating SYSFS entries...\n");
+
+  err = sysfs_create_file(&pdev->dev.kobj, &dev_attr_mcbsp_test.attr);
+  if (err < 0)
+    printk(KERN_ERR "Error creating SYSFS entries for McBSP tests...\n");
 
 
   // check for dock
