@@ -13,7 +13,6 @@
 #include <linux/serial_reg.h>
 #include <linux/spi/sc16is.h>
 
-
 #define LSR_SAVE_FLAGS UART_LSR_BRK_ERROR_BITS
 #define MSR_SAVE_FLAGS UART_MSR_ANY_DELTA
 #define BOTH_EMPTY 	(UART_LSR_TEMT | UART_LSR_THRE)
@@ -731,6 +730,35 @@ static void serial_sc16is_put_poll_char(struct uart_port *port,
   serial_out(s, UART_IER, ier);
 }
 
+static int spi_uart_ioctl(struct uart_port *port, unsigned int cmd, unsigned long arg)
+{
+	struct sc16is_port *s = container_of(port, struct sc16is_port, port);
+	unsigned int ret = 0;
+	switch (cmd)
+	{
+		case 1:
+			serial_out(s, 0x00, arg);
+			mdelay(10);
+			ret = serial_in(s, 0x00);
+			if (ret == arg)
+				printk("written=%lx--read=%x\n", arg, ret);
+			else
+				printk("written=%lx--read=%x\n", arg, ret);
+			break;
+		case 4:
+			serial_out(s, 0x00, arg);
+			mdelay(10);
+			ret = serial_in(s, 0x00);
+			if (ret == arg)
+				printk("written=%lx--read=%x\n", arg, ret);
+			else
+				printk("written=%lx--read=%x\n", arg, ret);
+			break;
+	}
+	return ret;
+}
+
+
 static struct uart_ops sc16is_uart_ops = {
   .tx_empty	= serial_sc16is_tx_empty,
   .set_mctrl	= serial_sc16is_set_mctrl,
@@ -749,6 +777,7 @@ static struct uart_ops sc16is_uart_ops = {
   .request_port	= serial_sc16is_request_port,
   .config_port	= serial_sc16is_config_port,
   .verify_port	= serial_sc16is_verify_port,
+  .ioctl	= spi_uart_ioctl,
 #ifdef CONFIG_CONSOLE_POLL
   .poll_get_char = serial_sc16is_get_poll_char,
   .poll_put_char = serial_sc16is_put_poll_char,
@@ -820,7 +849,6 @@ static int __devinit sc16is_uart_remove(struct platform_device *pdev)
 {
   return 0;
 }
-
 
 struct platform_driver sc16is_uart_plat_driver = {
   .driver.name  = "sc16is-uart",
