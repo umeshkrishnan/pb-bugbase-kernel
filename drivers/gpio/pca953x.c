@@ -15,6 +15,7 @@
 #include <linux/init.h>
 #include <linux/i2c.h>
 #include <linux/i2c/pca953x.h>
+#include <linux/delay.h>
 #ifdef CONFIG_OF_GPIO
 #include <linux/of_platform.h>
 #include <linux/of_gpio.h>
@@ -58,6 +59,80 @@ struct pca953x_chip {
 	struct gpio_chip gpio_chip;
 	char **names;
 };
+struct pca953x_chip *mcbsp_pim_chip;
+
+void McBSP_DR_DX_enable(int val)
+{
+	u8 data;
+	u8 data_reg_add = 0x02;  //PORT0 Data register
+	u8 command_reg_add = 0x06; //PORT0 Configuration command register
+	int rc;
+
+	/* configure line as output */
+	rc = i2c_smbus_read_byte_data(mcbsp_pim_chip->client, command_reg_add); 
+	if (rc < 0)
+	{
+		printk ("Unable to read DR_DX_EN status\n");
+		return;
+	}
+	mdelay (1);
+	data = (u8)rc;
+	data &= ~(1 << 4);
+	rc = i2c_smbus_write_byte_data(mcbsp_pim_chip->client, command_reg_add, data);
+	if (rc < 0)
+	{
+		printk ("Unable to change state of DR_DX_EN signal\n");
+	}
+	mdelay (1);
+
+	if (val == 1) {
+		rc = i2c_smbus_read_byte_data(mcbsp_pim_chip->client, data_reg_add);
+		if (rc < 0)
+		{
+			printk ("Unable to read DR_DX_EN status\n");
+			return;
+		}
+		mdelay (1);
+		data = (u8)rc;
+
+		data |= (1 << 4);
+
+		rc = i2c_smbus_write_byte_data(mcbsp_pim_chip->client, data_reg_add, data);
+		if (rc < 0)
+		{
+			printk ("Unable to change state of DR_DX_EN signal\n");
+		}
+		mdelay (1);
+		rc = i2c_smbus_read_byte_data(mcbsp_pim_chip->client, data_reg_add);
+		printk("val = %d rc = %x\n", val, rc);
+	}
+
+	else {
+		/* Make the output pin active low*/
+		rc = i2c_smbus_read_byte_data(mcbsp_pim_chip->client, data_reg_add);
+		if (rc < 0)
+		{
+			printk ("Unable to read DR_DX_EN status\n");
+			return;
+		}
+		mdelay (1);
+		data = (u8)rc;
+
+		data &= ~(1 << 4);
+
+		rc = i2c_smbus_write_byte_data(mcbsp_pim_chip->client, data_reg_add, data);
+		if (rc < 0)
+		{
+			printk ("Unable to change state of DR_DX_EN signal\n");
+		}
+		mdelay (1);
+		rc = i2c_smbus_read_byte_data(mcbsp_pim_chip->client, data_reg_add);
+		printk("val = %d rc = %x\n", val, rc);
+	}
+	return;
+}
+EXPORT_SYMBOL(McBSP_DR_DX_enable);
+
 
 static int pca953x_write_reg(struct pca953x_chip *chip, int reg, uint16_t val)
 {
@@ -283,6 +358,7 @@ static int __devinit pca953x_probe(struct i2c_client *client,
 
 	chip->names = pdata->names;
 
+	mcbsp_pim_chip = chip;
 	/* initialize cached registers from their original values.
 	 * we can't share this chip with another i2c master.
 	 */

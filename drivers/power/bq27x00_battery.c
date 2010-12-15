@@ -33,8 +33,8 @@
 #define BQ27x00_REG_VOLT		0x08
 #define BQ27x00_REG_FLAGS		0x0A
 #define BQ27x00_REG_AI			0x14
-#define BQ27x00_REG_TTF			0x18
 #define BQ27x00_REG_TTE			0x16
+#define BQ27x00_REG_TTF			0x18
 #define BQ27x00_REG_RSOC		0x2c /* Relative State-of-Charge */
 
 /* If the system has several batteries we need a different name for each
@@ -201,32 +201,30 @@ static int bq27x00_battery_rsoc(struct bq27x00_device_info *di)
 static int bq27x00_battery_tte(struct bq27x00_device_info *di)
 {
 	int ret;
-	unsigned int tte = 0;
+	int tte = 0;
 
 	ret = bq27x00_read(BQ27x00_REG_TTE, &tte, 1, di);
-//	printk("TTE = %x\n", tte);
+	printk("TTE = %x - %d\n", tte, tte);
 	if (ret) {
 		dev_err(di->dev, "error reading Time To Empty\n");
 		return ret;
 	}
 
-//	return rsoc >> 8;
 	return tte;
 }
 
 static int bq27x00_battery_ttf(struct bq27x00_device_info *di)
 {
 	int ret;
-	unsigned int ttf = 0;
+	int ttf = 0;
 
 	ret = bq27x00_read(BQ27x00_REG_TTF, &ttf, 1, di);
-//	printk("TTF = %x\n", ttf);
+	printk("TTF = %x - %d\n", ttf, ttf);
 	if (ret) {
 		dev_err(di->dev, "error reading Time To Empty\n");
 		return ret;
 	}
 
-//	return rsoc >> 8;
 	return ttf;
 }
 

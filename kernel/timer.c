@@ -709,13 +709,16 @@ EXPORT_SYMBOL(mod_timer_pending);
  */
 int mod_timer(struct timer_list *timer, unsigned long expires)
 {
+	timer_stats_timer_set_start_info(timer);
 	/*
 	 * This is a common optimization triggered by the
 	 * networking code - if the timer is re-modified
 	 * to be the same thing then just return:
 	 */
-	if (timer_pending(timer) && timer->expires == expires)
+	if (timer->expires == expires && timer_pending(timer))
 		return 1;
+	//if (timer_pending(timer) && timer->expires == expires)
+	//	return 1;
 
 	return __mod_timer(timer, expires, false, TIMER_NOT_PINNED);
 }

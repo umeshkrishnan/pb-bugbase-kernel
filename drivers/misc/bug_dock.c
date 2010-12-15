@@ -29,6 +29,7 @@
 #define USB_RESET        193
 #define DOCK_PRESENCE    113
 
+extern void McBSP_DR_DX_enable(int);
 extern int test_mcbsp (int);
 static DEFINE_MUTEX(count_lock);
 int usb_count;
@@ -111,6 +112,23 @@ static ssize_t store_mcbsp_test (struct device * dev, struct device_attribute * 
 	return count;
 }
 static DEVICE_ATTR(mcbsp_test, S_IWUSR, NULL, &store_mcbsp_test);
+
+static ssize_t store_mcbsp_en (struct device * dev, struct device_attribute * attr,
+		const char * buf, size_t count)
+{
+	int val=0;
+
+	sscanf (buf, "%d", &val);
+
+	if(val == 1)
+		McBSP_DR_DX_enable(1);
+	if (val == 0)
+		McBSP_DR_DX_enable(0);
+
+	return count;
+}
+static DEVICE_ATTR(mcbsp_en, S_IWUSR, NULL, &store_mcbsp_en);
+
 
 /**
  *    work queuing
@@ -221,6 +239,9 @@ static int bug_dock_probe(struct platform_device *pdev)
   err = sysfs_create_file(&pdev->dev.kobj, &dev_attr_mcbsp_test.attr);
   if (err < 0)
     printk(KERN_ERR "Error creating SYSFS entries for McBSP tests...\n");
+  err = sysfs_create_file(&pdev->dev.kobj, &dev_attr_mcbsp_en.attr);
+  if (err < 0)
+    printk(KERN_ERR "Error creating SYSFS entries for McBSP EN...\n");
 
 
   // check for dock
