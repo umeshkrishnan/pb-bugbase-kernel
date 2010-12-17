@@ -26,12 +26,12 @@ static struct omap_video_timings vga_panel_timings = {
   	.x_res		= 1024,
   	.y_res		= 768,
 	.pixel_clock	= 65000,
-	.hfp		= 24,
-	.hbp		= 160,
-	.hsw		= 136,
-	.vfp		= 3,
-	.vbp		= 29,
-	.vsw		= 6,
+	.hfp		= (24-1),
+	.hbp		= (160-1),
+	.hsw		= (136-1),
+	.vfp		= (3-1),
+	.vbp		= (29-1),
+	.vsw		= (6-1),
 	
    	/* 800 x 600 @ 60 Hz */
 	/*
@@ -49,10 +49,10 @@ static struct omap_video_timings vga_panel_timings = {
 
 static int vga_panel_probe(struct omap_dss_device *dssdev)
 {
-  //dssdev->panel.config =  OMAP_DSS_LCD_TFT | OMAP_DSS_LCD_IVS | 
-  //                               OMAP_DSS_LCD_IHS | OMAP_DSS_LCD_IPC;
+  dssdev->panel.config =  OMAP_DSS_LCD_TFT | OMAP_DSS_LCD_IVS |
+                                 OMAP_DSS_LCD_IHS | OMAP_DSS_LCD_IPC;
 
-	dssdev->panel.config = OMAP_DSS_LCD_TFT;
+//	dssdev->panel.config = OMAP_DSS_LCD_TFT;
 	dssdev->panel.timings = vga_panel_timings;
 
 	return 0;
