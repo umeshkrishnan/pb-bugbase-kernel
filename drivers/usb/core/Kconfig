@@ -93,6 +93,7 @@ config USB_DYNAMIC_MINORS
 config USB_SUSPEND
 	bool "USB selective suspend/resume and wakeup"
 	depends on USB && PM
+	default n
 	help
 	  If you say Y here, you can use driver calls or the sysfs
 	  "power/level" file to suspend or resume individual USB
@@ -109,7 +110,7 @@ config USB_SUSPEND
 config USB_OTG
 	bool
 	depends on USB && EXPERIMENTAL
-	select USB_SUSPEND
+#	select USB_SUSPEND
 	default n
 
 

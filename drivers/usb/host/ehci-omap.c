@@ -243,6 +243,7 @@ static int omap_start_ehc(struct ehci_hcd_omap *omap, struct usb_hcd *hcd)
 
 	dev_dbg(omap->dev, "starting TI EHCI USB Controller\n");
 
+#if 0
 	/* Start DPLL5 Programming:
 	 * Clock Framework is not doing this now:
 	 * This will be done in clock framework later
@@ -264,7 +265,7 @@ static int omap_start_ehc(struct ehci_hcd_omap *omap, struct usb_hcd *hcd)
 		dev_dbg(omap->dev, "idlest2 = 0x%x\n",
 			cm_read_mod_reg(PLL_MOD, CM_IDLEST2));
 	/* End DPLL5 programming */
-
+#endif
 
 	/* Enable Clocks for USBHOST */
 	omap->usbhost_ick = clk_get(omap->dev, "usbhost_ick");

@@ -895,7 +895,7 @@ static int __init omap3bug_twl_gpio_setup(struct device *dev,
 	/* Most GPIOs are for USB OTG.  Some are mostly sent to
 	 * the P2 connector; notably LEDA for the LCD backlight.
 	 */
-#if 0
+#if 1
 	gpio_request(gpio + 1, "usb_hub");
 	gpio_direction_output(gpio + 1, 1);
 #endif
@@ -1099,7 +1099,7 @@ void gen_gpio_settings(void)
 	return;
 
 }
-#if 0
+#if 1
 static struct ehci_hcd_omap_platform_data ehci_pdata __initconst = {
 
 	.port_mode[0] = EHCI_HCD_OMAP_MODE_UNKNOWN,
@@ -1130,9 +1130,10 @@ static void __init omap3_bug_init(void)
 	omap_serial_init();
 	platform_add_devices(omap3_bug_devices, ARRAY_SIZE(omap3_bug_devices));
 	//omap_init_twl4030();
-	//	usb_gpio_settings();
-	//	usb_musb_init();
-	//	usb_ehci_init(&ehci_pdata);
+	//usb_gpio_settings();
+	//usb_musb_init();
+//	omap_mux_init_gpio(126, OMAP_PIN_OUTPUT);
+	usb_ehci_init(&ehci_pdata);
 	gen_gpio_settings();
 	batt_gpio_settings();
 	omap3bug_flash_init();
