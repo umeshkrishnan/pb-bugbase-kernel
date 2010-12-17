@@ -1099,7 +1099,6 @@ void gen_gpio_settings(void)
 	return;
 
 }
-#if 1
 static struct ehci_hcd_omap_platform_data ehci_pdata __initconst = {
 
 	.port_mode[0] = EHCI_HCD_OMAP_MODE_UNKNOWN,
@@ -1112,7 +1111,21 @@ static struct ehci_hcd_omap_platform_data ehci_pdata __initconst = {
 	.reset_gpio_port[1]  = 126,
 	.reset_gpio_port[2]  = -EINVAL
 };
-#endif
+
+static void usb_asic_init(void)
+{
+	int r = 0;
+
+	omap_mux_init_gpio(186, OMAP_PIN_OUTPUT);
+
+	r |= gpio_request(186,  "usb_asic_pwr_en");
+	if (r) {
+		printk("Gpio request for usb_asic_pwr_en failed\n");
+		return;
+	}
+	gpio_direction_output(186, 1);
+	return;
+}
 
 static void __init omap3_bug_init(void)
 {
@@ -1132,8 +1145,8 @@ static void __init omap3_bug_init(void)
 	//omap_init_twl4030();
 	//usb_gpio_settings();
 	//usb_musb_init();
-//	omap_mux_init_gpio(126, OMAP_PIN_OUTPUT);
 	usb_ehci_init(&ehci_pdata);
+	usb_asic_init();
 	gen_gpio_settings();
 	batt_gpio_settings();
 	omap3bug_flash_init();
