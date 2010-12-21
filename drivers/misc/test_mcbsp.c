@@ -341,7 +341,6 @@ s32 read_data_mcbsp( U32 mcbsp_base_addr,
 		ret_status = 0;
         while (!(ret_status & 0x2))
         {
-		udelay(100);
 			ret_status = in_regl(mcbsp_base_addr + MCBSP_SPCR1_OFFSET);
 			//printk ("Reciver is not ready\n");
 #if 1
@@ -515,7 +514,6 @@ int test_mcbsp (int sid)
 		(in_regl((mcbsp_base_addr + MCBSP_SPCR2_OFFSET)) | (1 << 7)));
 	out_regl((mcbsp_base_addr + MCBSP_SPCR2_OFFSET),
 		(in_regl((mcbsp_base_addr + MCBSP_SPCR2_OFFSET)) | 0x1));
-	mdelay (10);
 	for (i=0; i<128; i++)
 	{
 		data = i+1;
