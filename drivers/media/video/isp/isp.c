@@ -51,7 +51,7 @@
 #include "isph3a.h"
 #include "isphist.h"
 
-#define cpu_is_omap3630()		0
+//#define cpu_is_omap3630()		0
 
 static void isp_save_ctx(struct isp_device *isp);
 

@@ -1144,7 +1144,7 @@ static void __init omap3_bug_init(void)
 	platform_add_devices(omap3_bug_devices, ARRAY_SIZE(omap3_bug_devices));
 	//omap_init_twl4030();
 	//usb_gpio_settings();
-	//usb_musb_init();
+	usb_musb_init();
 	usb_ehci_init(&ehci_pdata);
 	usb_asic_init();
 	gen_gpio_settings();

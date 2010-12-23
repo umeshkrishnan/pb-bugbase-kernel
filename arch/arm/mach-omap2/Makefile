@@ -114,7 +114,7 @@ obj-$(CONFIG_MACH_OMAP_ZOOM2)		+= board-zoom2.o \
 obj-$(CONFIG_MACH_OMAP_4430SDP)		+= board-4430sdp.o
 
 # Platform specific device init code
-#obj-y					+= usb-musb.o
+obj-y					+= usb-musb.o
 #obj-$(CONFIG_MACH_OMAP2_TUSB6010)	+= usb-tusb6010.o
 obj-y					+= usb-ehci.o
 
