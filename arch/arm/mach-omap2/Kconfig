@@ -18,11 +18,24 @@ config ARCH_OMAP2430
 config ARCH_OMAP34XX
 	bool "OMAP34xx Based System"
 	depends on ARCH_OMAP3
+	select USB_ARCH_HAS_EHCI
 
 config ARCH_OMAP3430
 	bool "OMAP3430 support"
 	depends on ARCH_OMAP3 && ARCH_OMAP34XX
 	select ARCH_OMAP_OTG
+
+config OMAP_PACKAGE_CBC
+       bool
+
+config OMAP_PACKAGE_CBB
+       bool
+
+config OMAP_PACKAGE_CUS
+       bool
+
+config OMAP_PACKAGE_CBP
+       bool
 
 comment "OMAP Board Type"
 	depends on ARCH_OMAP2 || ARCH_OMAP3 || ARCH_OMAP4
@@ -64,11 +77,13 @@ config MACH_OVERO
 config MACH_OMAP3EVM
 	bool "OMAP 3530 EVM board"
 	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
 
 config MACH_OMAP3BUG
 	bool "OMAP 3530 BUGBASE board"
 	select HAVE_PWM
         depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
 
 config MACH_OMAP3_PANDORA
 	bool "OMAP3 Pandora"
@@ -93,3 +108,20 @@ config MACH_OMAP_ZOOM2
 config MACH_OMAP_4430SDP
 	bool "OMAP 4430 SDP board"
 	depends on ARCH_OMAP4
+
+config PMIC_TWL4030
+	bool "TWL4030/TPS65950 Power Module"
+	default y
+	depends on TWL4030_CORE && MACH_OMAP3EVM
+	select REGULATOR_TWL4030 if REGULATOR
+	help
+	Say yes here if you are using the TWL4030/TPS65950 based power module
+	for the EVM boards.
+
+config OMAP3_EMU
+	bool "OMAP3 debugging peripherals"
+	depends on ARCH_OMAP3
+	select OC_ETM
+	help
+	Say Y here to enable debugging hardware of omap3
+

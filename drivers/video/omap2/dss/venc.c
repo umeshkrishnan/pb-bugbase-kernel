@@ -34,8 +34,8 @@
 #include <linux/platform_device.h>
 #include <linux/regulator/consumer.h>
 
-#include <mach/display.h>
-#include <mach/cpu.h>
+#include <plat/display.h>
+#include <plat/cpu.h>
 
 #include "dss.h"
 
@@ -482,7 +482,8 @@ int venc_init(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	venc.vdda_dac_reg = dss_get_vdda_dac();
+//	venc.vdda_dac_reg = dss_get_vdda_dac();
+	venc.vdda_dac_reg = regulator_get(&pdev->dev, "vdda_dac");
 	if (IS_ERR(venc.vdda_dac_reg)) {
 		iounmap(venc.base);
 		DSSERR("can't get VDDA_DAC regulator\n");

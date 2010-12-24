@@ -33,8 +33,8 @@
 #include <linux/kthread.h>
 #include <linux/wait.h>
 
-#include <mach/display.h>
-#include <mach/clock.h>
+#include <plat/display.h>
+#include <plat/clock.h>
 
 #include "dss.h"
 
@@ -1096,7 +1096,8 @@ int dsi_pll_set_clock_div(struct dsi_clock_info *cinfo)
 		f = 0x7;
 
 	l = dsi_read_reg(DSI_PLL_CONFIGURATION2);
-	l = FLD_MOD(l, f, 4, 1);		/* DSI_PLL_FREQSEL */
+	if (!cpu_is_omap3630())
+		l = FLD_MOD(l, f, 4, 1);	/* DSI_PLL_FREQSEL */
 	l = FLD_MOD(l, cinfo->use_dss2_fck ? 0 : 1,
 			11, 11);		/* DSI_PLL_CLKSEL */
 	l = FLD_MOD(l, cinfo->highfreq,

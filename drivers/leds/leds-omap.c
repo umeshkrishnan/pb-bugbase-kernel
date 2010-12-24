@@ -16,8 +16,8 @@
 #include <linux/leds.h>
 #include <linux/gpio.h>
 
-#include <mach/hardware.h>
-#include <mach/led.h>
+#include <plat/hardware.h>
+#include <plat/led.h>
 
 /* our context */
 

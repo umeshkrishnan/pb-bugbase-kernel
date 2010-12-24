@@ -171,6 +171,7 @@ struct clocksource {
 	u32 mult;
 	u32 mult_orig;
 	u32 shift;
+	u64 max_idle_ns;
 	unsigned long flags;
 	cycle_t (*vread)(void);
 	void (*resume)(void);
@@ -372,6 +373,17 @@ static inline void clocksource_calculate_interval(struct clocksource *c,
 	c->raw_interval = ((u64)c->cycle_interval * c->mult_orig) >> c->shift;
 }
 
+/*
+ * clocksource_cyc2ns - converts clocksource cycles to nanoseconds
+ *
+ * Converts cycles to nanoseconds, using the given mult and shift.
+ *
+ * XXX - This could use some mult_lxl_ll() asm optimization
+ */
+static inline s64 clocksource_cyc2ns(cycle_t cycles, u32 mult, u32 shift)
+{
+	return ((u64) cycles * mult) >> shift;
+}
 
 /* used to install a new clocksource */
 extern int clocksource_register(struct clocksource*);
@@ -380,12 +392,12 @@ extern void clocksource_touch_watchdog(void);
 extern struct clocksource* clocksource_get_next(void);
 extern void clocksource_change_rating(struct clocksource *cs, int rating);
 extern void clocksource_resume(void);
-
+extern struct clocksource * __init __weak clocksource_default_clock(void);
 #ifdef CONFIG_GENERIC_TIME_VSYSCALL
-extern void update_vsyscall(struct timespec *ts, struct clocksource *c);
+extern void update_vsyscall(struct timespec *ts, struct clocksource *c, u32 mult);
 extern void update_vsyscall_tz(void);
 #else
-static inline void update_vsyscall(struct timespec *ts, struct clocksource *c)
+static inline void update_vsyscall(struct timespec *ts, struct clocksource *c, u32 mult)
 {
 }
 

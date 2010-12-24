@@ -47,7 +47,7 @@
 #include <linux/timer.h>
 
 #include <asm/uaccess.h>
-
+#if 0
 /**
  * ktime_get - get the monotonic time in ktime_t format
  *
@@ -78,7 +78,7 @@ ktime_t ktime_get_real(void)
 }
 
 EXPORT_SYMBOL_GPL(ktime_get_real);
-
+#endif
 /*
  * The timer bases:
  *
@@ -106,6 +106,7 @@ DEFINE_PER_CPU(struct hrtimer_cpu_base, hrtimer_bases) =
 	}
 };
 
+#if 0
 /**
  * ktime_get_ts - get the monotonic clock in timespec format
  * @ts:		pointer to timespec variable
@@ -130,7 +131,7 @@ void ktime_get_ts(struct timespec *ts)
 				ts->tv_nsec + tomono.tv_nsec);
 }
 EXPORT_SYMBOL_GPL(ktime_get_ts);
-
+#endif
 /*
  * Get the coarse grained time at the softirq based on xtime and
  * wall_to_monotonic.

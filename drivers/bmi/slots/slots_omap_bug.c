@@ -9,7 +9,7 @@
 #include <linux/interrupt.h>
 #include <linux/bmi.h>
 #include <linux/bmi/omap_bmi.h>
-#include <mach/board.h>
+#include <plat/board.h>
 
 #define BMI_GPIO_0 139
 #define BMI_GPIO_1 158

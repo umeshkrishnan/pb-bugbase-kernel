@@ -24,7 +24,7 @@
 #include <linux/debugfs.h>
 #include <linux/io.h>
 
-#include <mach/clock.h>
+#include <plat/clock.h>
 
 static LIST_HEAD(clocks);
 static DEFINE_MUTEX(clocks_mutex);
@@ -40,36 +40,10 @@ static struct clk_functions *arch_clock;
  * clock framework is not up , it is defined here to avoid rework in
  * every driver. Also dummy prcm reset function is added */
 
-/* Dummy hooks only for OMAP4.For rest OMAPs, common clkdev is used */
-#if defined(CONFIG_ARCH_OMAP4)
-struct clk *clk_get(struct device *dev, const char *id)
-{
-	return NULL;
-}
-EXPORT_SYMBOL(clk_get);
-
-void clk_put(struct clk *clk)
-{
-}
-EXPORT_SYMBOL(clk_put);
-
-void omap2_clk_prepare_for_reboot(void)
-{
-}
-EXPORT_SYMBOL(omap2_clk_prepare_for_reboot);
-
-void omap_prcm_arch_reset(char mode)
-{
-}
-EXPORT_SYMBOL(omap_prcm_arch_reset);
-#endif
 int clk_enable(struct clk *clk)
 {
 	unsigned long flags;
 	int ret = 0;
-	if (cpu_is_omap44xx())
-		/* OMAP4 clk framework not supported yet */
-		return 0;
 
 	if (clk == NULL || IS_ERR(clk))
 		return -EINVAL;
@@ -205,6 +179,7 @@ EXPORT_SYMBOL(clk_get_parent);
 
 unsigned int __initdata mpurate;
 
+
 /*
  * By default we use the rate set by the bootloader.
  * You can override this with mpurate= cmdline option.
@@ -216,7 +191,7 @@ static int __init omap_clk_setup(char *str)
 	if (!mpurate)
 		return 1;
 
-	if (mpurate < 1000)
+	if (mpurate < 2000)
 		mpurate *= 1000000;
 
 	return 1;

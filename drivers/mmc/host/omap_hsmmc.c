@@ -27,11 +27,11 @@
 #include <linux/mmc/host.h>
 #include <linux/io.h>
 #include <linux/semaphore.h>
-#include <mach/dma.h>
-#include <mach/hardware.h>
-#include <mach/board.h>
-#include <mach/mmc.h>
-#include <mach/cpu.h>
+#include <plat/dma.h>
+#include <plat/hardware.h>
+#include <plat/board.h>
+#include <plat/mmc.h>
+#include <plat/cpu.h>
 
 /* OMAP HSMMC Host Controller Registers */
 #define OMAP_HSMMC_SYSCONFIG	0x0010

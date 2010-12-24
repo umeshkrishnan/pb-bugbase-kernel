@@ -3,7 +3,7 @@
 #ifndef	__ASM_ARCH_OMAP_USB_H
 #define	__ASM_ARCH_OMAP_USB_H
 
-#include <mach/board.h>
+#include <plat/board.h>
 
 #define OMAP3_HS_USB_PORTS	3
 enum ehci_hcd_omap_mode {

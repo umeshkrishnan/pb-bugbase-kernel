@@ -261,6 +261,13 @@ config BUG_BQSIG
 	  Say yes to enable omap3 bug to respond to low battery signals issued
 	  by the bq27500 fuel gauge.
 
+config TEST_MCBSP
+	tristate "Simple mcbsp test module"
+	depends on MACH_OMAP3BUG
+	default y
+	help
+	  Tests simple loop back for OMAP McBSP.
+
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"

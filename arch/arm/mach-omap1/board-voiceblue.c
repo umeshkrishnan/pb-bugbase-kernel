@@ -23,17 +23,17 @@
 #include <linux/serial_8250.h>
 #include <linux/serial_reg.h>
 
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 #include <asm/mach-types.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/flash.h>
 #include <asm/mach/map.h>
 
-#include <mach/common.h>
-#include <mach/gpio.h>
-#include <mach/mux.h>
-#include <mach/tc.h>
-#include <mach/usb.h>
+#include <plat/common.h>
+#include <plat/gpio.h>
+#include <plat/mux.h>
+#include <plat/tc.h>
+#include <plat/usb.h>
 
 static struct plat_serial8250_port voiceblue_ports[] = {
 	{

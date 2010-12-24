@@ -31,7 +31,7 @@
 #include <linux/videodev2.h>
 #include <linux/i2c/twl4030.h>
 
-#include <mach/mux.h>
+#include <plat/mux.h>
 
 #include <media/v4l2-int-device.h>
 #include <media/tvp514x.h>

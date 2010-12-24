@@ -126,6 +126,7 @@ static int sc16is_gpio_probe(struct platform_device *pdev)
 {
   struct sc16is_gpio_platform_data *pdata = pdev->dev.platform_data;
   struct sc16is_gpio_chip *chip;
+  struct gpio_chip *gc;
   int res = 0;
   
   printk(KERN_INFO "SC16IS: GPIO Probe Called...0x%x \n",pdata->gpio_base);
@@ -159,6 +160,19 @@ static int sc16is_gpio_probe(struct platform_device *pdev)
     printk(KERN_INFO "SC16IS GPIO Setup called");
     res = pdata->setup(chip->sc16is->spi_dev, chip->gpio_chip.base, chip->gpio_chip.ngpio, pdata->context);
   }
+
+  /* PB-Bugbase*/
+  gc = &chip->gpio_chip;
+
+  sc16is_gpio_direction_output(gc, 0, 0);
+  sc16is_gpio_direction_output(gc, 1, 1);
+  sc16is_gpio_direction_output(gc, 2, 0);
+  sc16is_gpio_direction_output(gc, 3, 0);
+  sc16is_gpio_direction_output(gc, 4, 0);
+  sc16is_gpio_direction_output(gc, 5, 0);
+  sc16is_gpio_direction_output(gc, 6, 0);
+  sc16is_gpio_direction_output(gc, 7, 1);
+
   return 0;
 
  failed:

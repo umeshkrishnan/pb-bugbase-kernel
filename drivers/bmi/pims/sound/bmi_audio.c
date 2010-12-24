@@ -120,9 +120,9 @@
 #include <linux/pm.h>
 #endif	// CONFIG_PM
 
-#include <mach/dma.h>
-#include <mach/spba.h>
-#include <mach/clock.h>
+#include <plat/dma.h>
+#include <plat/spba.h>
+#include <plat/clock.h>
 #include <asm/mach-types.h>
 
 #include "../../../../arch/arm/mach-mx3/crm_regs.h"

@@ -13,7 +13,7 @@
  * This driver is based on padlock-sha.c driver.
  */
 
-#include <mach/irqs.h>
+#include <plat/irqs.h>
 #include <crypto/algapi.h>
 #include <crypto/sha.h>
 #include <linux/err.h>

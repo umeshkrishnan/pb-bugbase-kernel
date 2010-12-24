@@ -186,6 +186,7 @@ void ntp_clear(void)
  */
 static enum hrtimer_restart ntp_leap_second(struct hrtimer *timer)
 {
+	u32 mult;
 	enum hrtimer_restart res = HRTIMER_NORESTART;
 
 	write_seqlock(&xtime_lock);
@@ -219,7 +220,7 @@ static enum hrtimer_restart ntp_leap_second(struct hrtimer *timer)
 			time_state = TIME_OK;
 		break;
 	}
-	update_vsyscall(&xtime, clock);
+	update_vsyscall(&xtime, clock, mult);
 
 	write_sequnlock(&xtime_lock);
 

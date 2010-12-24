@@ -37,7 +37,7 @@
 #include <linux/platform_device.h>
 #include <linux/clk.h>
 #include <linux/gpio.h>
-#include <mach/usb.h>
+#include <plat/usb.h>
 
 /*
  * OMAP USBHOST Register addresses: VIRTUAL ADDRESSES
@@ -235,7 +235,7 @@ static void omap_usb_utmi_init(struct ehci_hcd_omap *omap, u8 tll_channel_mask)
  */
 static int omap_start_ehc(struct ehci_hcd_omap *omap, struct usb_hcd *hcd)
 {
-	struct omap_chip_id oci = OMAP_CHIP_INIT(CHIP_GE_OMAP3430ES3);
+	struct omap_chip_id oci = OMAP_CHIP_INIT(CHIP_GE_OMAP3430ES3_1);
 	unsigned long timeout = jiffies + msecs_to_jiffies(1000);
 	u8 tll_ch_mask = 0;
 	unsigned reg = 0;
@@ -243,6 +243,7 @@ static int omap_start_ehc(struct ehci_hcd_omap *omap, struct usb_hcd *hcd)
 
 	dev_dbg(omap->dev, "starting TI EHCI USB Controller\n");
 
+#if 0
 	/* Start DPLL5 Programming:
 	 * Clock Framework is not doing this now:
 	 * This will be done in clock framework later
@@ -264,7 +265,7 @@ static int omap_start_ehc(struct ehci_hcd_omap *omap, struct usb_hcd *hcd)
 		dev_dbg(omap->dev, "idlest2 = 0x%x\n",
 			cm_read_mod_reg(PLL_MOD, CM_IDLEST2));
 	/* End DPLL5 programming */
-
+#endif
 
 	/* Enable Clocks for USBHOST */
 	omap->usbhost_ick = clk_get(omap->dev, "usbhost_ick");
@@ -426,6 +427,7 @@ static int omap_start_ehc(struct ehci_hcd_omap *omap, struct usb_hcd *hcd)
 			gpio_set_value(omap->reset_gpio_port[1], 1);
 	}
 
+#if 0
 	if (omap->chargepump) {
 
 		/* Refer ISSUE2: LINK assumes external charge pump */
@@ -444,6 +446,7 @@ static int omap_start_ehc(struct ehci_hcd_omap *omap, struct usb_hcd *hcd)
 				(1 << EHCI_INSNREG05_ULPI_CONTROL_SHIFT) |
 				(0x26));
 	}
+#endif
 
 	return 0;
 
@@ -618,7 +621,7 @@ static int ehci_hcd_omap_probe(struct platform_device *pdev)
 	omap->port_mode[0]		= pdata->port_mode[0];
 	omap->port_mode[1]		= pdata->port_mode[1];
 	omap->port_mode[2]		= pdata->port_mode[2];
-	omap->chargepump		= pdata->chargepump;
+//	omap->chargepump		= pdata->chargepump;
 	omap->ehci		= hcd_to_ehci(hcd);
 	omap->ehci->sbrn	= 0x20;
 

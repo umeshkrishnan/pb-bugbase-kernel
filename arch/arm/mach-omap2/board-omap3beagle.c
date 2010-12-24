@@ -29,28 +29,48 @@
 #include <linux/mtd/nand.h>
 
 #include <linux/regulator/machine.h>
-#include <linux/i2c/twl4030.h>
+#include <linux/i2c/twl.h>
 
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 #include <asm/mach-types.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
 #include <asm/mach/flash.h>
 
-#include <mach/board.h>
-#include <mach/common.h>
-#include <mach/gpmc.h>
-#include <mach/nand.h>
-#include <mach/mux.h>
-#include <mach/usb.h>
-#include <mach/timer-gp.h>
+#include <plat/board.h>
+#include <plat/common.h>
+#include <plat/gpmc.h>
+#include <plat/nand.h>
+#include <plat/usb.h>
+#include <plat/timer-gp.h>
+#include <plat/clock.h>
+#include <plat/omap-pm.h>
 
+#include "mux.h"
 #include "mmc-twl4030.h"
+#include "pm.h"
+#include "omap3-opp.h"
 
 #define GPMC_CS0_BASE  0x60
 #define GPMC_CS_SIZE   0x30
 
 #define NAND_BLOCK_SIZE		SZ_128K
+
+#ifdef CONFIG_PM
+static struct omap_opp * _omap35x_mpu_rate_table	= omap35x_mpu_rate_table;
+static struct omap_opp * _omap37x_mpu_rate_table	= omap37x_mpu_rate_table;
+static struct omap_opp * _omap35x_dsp_rate_table	= omap35x_dsp_rate_table;
+static struct omap_opp * _omap37x_dsp_rate_table	= omap37x_dsp_rate_table;
+static struct omap_opp * _omap35x_l3_rate_table		= omap35x_l3_rate_table;
+static struct omap_opp * _omap37x_l3_rate_table		= omap37x_l3_rate_table;
+#else	/* CONFIG_PM */
+static struct omap_opp * _omap35x_mpu_rate_table	= NULL;
+static struct omap_opp * _omap37x_mpu_rate_table	= NULL;
+static struct omap_opp * _omap35x_dsp_rate_table	= NULL;
+static struct omap_opp * _omap37x_dsp_rate_table	= NULL;
+static struct omap_opp * _omap35x_l3_rate_table		= NULL;
+static struct omap_opp * _omap37x_l3_rate_table		= NULL;
+#endif	/* CONFIG_PM */
 
 static struct mtd_partition omap3beagle_nand_partitions[] = {
 	/* All the partition sizes are listed in terms of NAND block size */
@@ -140,10 +160,10 @@ static int beagle_twl_gpio_setup(struct device *dev,
 		unsigned gpio, unsigned ngpio)
 {
 	if (system_rev >= 0x20 && system_rev <= 0x34301000) {
-		omap_cfg_reg(AG9_34XX_GPIO23);
+		omap_mux_init_gpio(23, OMAP_PIN_INPUT);
 		mmc[0].gpio_wp = 23;
 	} else {
-		omap_cfg_reg(AH8_34XX_GPIO29);
+		omap_mux_init_gpio(29, OMAP_PIN_INPUT);
 	}
 	/* gpio + 0 is "mmc0_cd" (input/IRQ) */
 	mmc[0].gpio_cd = gpio + 0;
@@ -254,6 +274,15 @@ static struct twl4030_usb_data beagle_usb_data = {
 	.usb_mode	= T2_USB_MODE_ULPI,
 };
 
+static struct twl4030_codec_audio_data beagle_audio_data = {
+	.audio_mclk = 26000000,
+};
+
+static struct twl4030_codec_data beagle_codec_data = {
+	.audio_mclk = 26000000,
+	.audio = &beagle_audio_data,
+};
+
 static struct twl4030_platform_data beagle_twldata = {
 	.irq_base	= TWL4030_IRQ_BASE,
 	.irq_end	= TWL4030_IRQ_END,
@@ -261,6 +290,7 @@ static struct twl4030_platform_data beagle_twldata = {
 	/* platform_data for children goes here */
 	.usb		= &beagle_usb_data,
 	.gpio		= &beagle_gpio_data,
+	.codec		= &beagle_codec_data,
 	.vmmc1		= &beagle_vmmc1,
 	.vsim		= &beagle_vsim,
 	.vdac		= &beagle_vdac,
@@ -382,8 +412,21 @@ static void __init omap3_beagle_init_irq(void)
 {
 	omap_board_config = omap3_beagle_config;
 	omap_board_config_size = ARRAY_SIZE(omap3_beagle_config);
-	omap2_init_common_hw(mt46h32m32lf6_sdrc_params,
-			     mt46h32m32lf6_sdrc_params);
+
+	if (cpu_is_omap3630()) {
+		omap2_init_common_hw(mt46h32m32lf6_sdrc_params,
+						mt46h32m32lf6_sdrc_params,
+						_omap37x_mpu_rate_table,
+						_omap37x_dsp_rate_table,
+						_omap37x_l3_rate_table);
+	} else {
+		omap2_init_common_hw(mt46h32m32lf6_sdrc_params,
+						mt46h32m32lf6_sdrc_params,
+						_omap35x_mpu_rate_table,
+						_omap35x_dsp_rate_table,
+						_omap35x_l3_rate_table);
+	}
+
 	omap_init_irq();
 #ifdef CONFIG_OMAP_32K_TIMER
 	omap2_gp_clockevent_set_gptimer(12);
@@ -479,7 +522,7 @@ static void __init omap3_beagle_map_io(void)
 MACHINE_START(OMAP3_BEAGLE, "OMAP3 Beagle Board")
 	/* Maintainer: Syed Mohammed Khasim - http://beagleboard.org */
 	.phys_io	= 0x48000000,
-	.io_pg_offst	= ((0xd8000000) >> 18) & 0xfffc,
+	.io_pg_offst	= ((0xfa000000) >> 18) & 0xfffc,
 	.boot_params	= 0x80000100,
 	.map_io		= omap3_beagle_map_io,
 	.init_irq	= omap3_beagle_init_irq,

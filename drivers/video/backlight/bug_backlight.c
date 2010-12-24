@@ -22,7 +22,7 @@
 #include <linux/fb.h>
 #include <linux/backlight.h>
 #include <linux/i2c/twl4030.h>
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 
 /**
  * Name of the driver

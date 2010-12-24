@@ -23,12 +23,12 @@
 #include <linux/errno.h>
 #include <linux/io.h>
 
-#include <mach/hardware.h>
+#include <plat/hardware.h>
 #include <asm/irq.h>
 #include <asm/mach/irq.h>
 
-#include <mach/fpga.h>
-#include <mach/gpio.h>
+#include <plat/fpga.h>
+#include <plat/gpio.h>
 
 static void fpga_mask_irq(unsigned int irq)
 {
