@@ -73,11 +73,11 @@ static int omap3bug_ioexp_gpio_teardown(struct i2c_client *client,
 static int omap3bug_spi_uart_gpio_setup(struct spi_device *spi,
 		unsigned gpio, unsigned ngpio, void *context);
 
-/*
-   static struct omap_uart_config omap3_bug_uart_config __initdata = {
-   .enabled_uarts	= ((1 << 0) | (1 << 1) | (1 << 2)),
-   };
-   */
+
+static struct omap_uart_config omap3_bug_uart_config __initdata = {
+	.enabled_uarts	= ((1 << 0) | (1 << 1) | (1 << 2)),
+};
+
 #ifdef CONFIG_OMAP_MUX
 static struct omap_board_mux pb_bugbase_mux[] __initdata = {
 	OMAP3_MUX(DSS_PCLK, OMAP_MUX_MODE0 | OMAP_PIN_OUTPUT),
@@ -319,7 +319,6 @@ static int __init omap3_bug_i2c_init(void)
 	return 0;
 }
 
-#if 1
 /*
  * For new frame buffer driver based on DSS2 library
  */
@@ -339,7 +338,6 @@ static struct platform_device omap3bug_vout_device = {
 	.resource 		= &omap3bug_vout_resource[0],
 	.id		        = -1,
 };
-#endif
 
 #define LCD_PANEL_LR		2
 #define LCD_PANEL_UD		3
@@ -355,7 +353,7 @@ static struct platform_device omap3bug_vout_device = {
 #define ENABLE_VDAC_DEV_GRP	0x20
 #define ENABLE_VPLL2_DEDICATED	0x05
 #define ENABLE_VPLL2_DEV_GRP	0xE0
-#if 1
+
 static void __init omap3_bug_display_init(void)
 {
 	int r = 0;
@@ -363,17 +361,13 @@ static void __init omap3_bug_display_init(void)
 	   r  = gpio_request(VIDEO_PIM_ENABLE, "lcd_power");
 	   r |= gpio_request(VIDEO_PIM_SW_ENABLE, "lcd_level_shifter");
 	   */
-	printk("*********Inside %s----%d\n", __func__, __LINE__);
 	r |= gpio_request(90,  "lcd_shutdown");
 	r |= gpio_request(93,  "lcd_reset");
 	r |= gpio_request(10,  "dvi_reset");
 	r |= gpio_request(92,  "acc_reset");
 	if (r) {
-		printk("*********GPIO REQUEST FAILED\n");
 		printk(KERN_INFO "gpio request failed...\n");
 	}
-	else
-		printk("*********GPIO REQUEST DONE\n");
 
 	return;
 }
@@ -381,23 +375,6 @@ static void __init omap3_bug_display_init(void)
 static int omap3_bug_panel_enable_lcd(struct omap_dss_device *display)
 {
 
-#if 0
-	omap_cfg_reg (LCD_MCSPI3_CLK);
-	omap_cfg_reg (LCD_MCSPI3_SIMO);
-	omap_cfg_reg (LCD_SHUTDOWN);
-	omap_cfg_reg (LCD_MCSPI3_CS);
-	omap_cfg_reg (ACC_RESET);
-	omap_cfg_reg (LCD_TP_RESET);
-	omap_cfg_reg (ACC_INT);
-#endif
-	/*
-	   __raw_writew(0x02, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA18_OFFSET);
-	   __raw_writew(0x02, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA19_OFFSET);
-	   __raw_writew(0x02, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA21_OFFSET);
-	   omap_mux_init_gpio(90, OMAP_PIN_OUTPUT);
-	   omap_mux_init_gpio(92, OMAP_PIN_OUTPUT);
-	   omap_mux_init_gpio(93, OMAP_PIN_OUTPUT);
-	   */
 	/*
 	   gpio_direction_output(VIDEO_PIM_ENABLE, 1);
 	   gpio_direction_output(VIDEO_PIM_SW_ENABLE, 0);
@@ -411,23 +388,6 @@ static int omap3_bug_panel_enable_lcd(struct omap_dss_device *display)
 static void omap3_bug_panel_disable_lcd(struct omap_dss_device *display)
 {
 	//gpio_direction_output(VIDEO_PIM_SW_ENABLE, 1);
-#if 0
-	// Mux these pins to safe mode
-	omap_cfg_reg (DSS_D18);
-	omap_cfg_reg (DSS_D19);
-	omap_cfg_reg (DSS_D20);
-	omap_cfg_reg (DSS_D21);
-	omap_cfg_reg (DSS_D21);
-	omap_cfg_reg (DSS_D22);
-	omap_cfg_reg (DSS_D23);
-#endif
-	//	__raw_writew(0x0, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA18_OFFSET);
-	//	__raw_writew(0x0, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA19_OFFSET);
-	//	__raw_writew(0x0, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA20_OFFSET);
-	//	__raw_writew(0x0, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA21_OFFSET);
-	//	__raw_writew(0x0, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA22_OFFSET);
-	//	__raw_writew(0x0, mux_base + OMAP3_CONTROL_PADCONF_DSS_DATA23_OFFSET);
-
 	return;
 }
 
@@ -441,7 +401,7 @@ static struct omap_dss_device omap3_bug_lcd_device = {
 	.platform_enable = omap3_bug_panel_enable_lcd,
 	.platform_disable = omap3_bug_panel_disable_lcd,
 };
-#if 1
+
 static int omap3_bug_panel_enable_dvi(struct omap_dss_device *display)
 {
 	/*
@@ -500,7 +460,7 @@ static struct omap_dss_device omap3_bug_dvi_device = {
 	.platform_enable     = omap3_bug_panel_enable_dvi,
 	.platform_disable    = omap3_bug_panel_disable_dvi,
 };
-#endif
+
 struct omap_dss_device *omap3_bug_display_devices[] = {
 	&omap3_bug_lcd_device,
 	&omap3_bug_dvi_device,
@@ -656,7 +616,6 @@ static struct platform_device omap3_bug_pwr_switch = {
 	.num_resources = ARRAY_SIZE(omap3_bug_pwr_switch_resources),
 	.resource = omap3_bug_pwr_switch_resources,
 };
-#endif
 
 static struct platform_device omap3_bug_pwm_a = {
 	.name = "twl4030_pwm",
@@ -895,10 +854,9 @@ static int __init omap3bug_twl_gpio_setup(struct device *dev,
 	/* Most GPIOs are for USB OTG.  Some are mostly sent to
 	 * the P2 connector; notably LEDA for the LCD backlight.
 	 */
-#if 1
 	gpio_request(gpio + 1, "usb_hub");
 	gpio_direction_output(gpio + 1, 1);
-#endif
+
 	r |= gpio_request(gpio + 15, "hp_det");
 	if (r){
 		printk("gpio request for hp_det failed\n");
@@ -947,12 +905,12 @@ static int omap3bug_spi_uart_gpio_setup(struct spi_device *spi, unsigned gpio, u
 
 	printk(KERN_INFO "spi_uart_gpio: Setting up gpios...\n");
 	omap3_bug_display_init();
-	r =   gpio_request(gpio + 4, "wifi_en");  
+	r =   gpio_request(230, "wifi_en");  
 	if (r) {
 		printk(KERN_ERR "spi_uart_gpio: failed to get wifi_en...\n");
 		return r;
 	}
-	gpio_direction_output(gpio+4, 1);
+	gpio_direction_output(230, 1);
 
 	mdelay(100);
 	r =   gpio_request(157, "wifi_rst");
@@ -1053,7 +1011,7 @@ void batt_gpio_settings(void)
 	r |= gpio_request(111, "usb_hpwr");
 
 	if (r)
-		printk("*******Gpio request for battery failed\n");
+		printk(KERN_ERR "Gpio request for battery failed\n");
 
 	gpio_direction_output(96, 0);
 	gpio_direction_output(111, 1);
@@ -1120,7 +1078,7 @@ static void usb_asic_init(void)
 
 	r |= gpio_request(186,  "usb_asic_pwr_en");
 	if (r) {
-		printk("Gpio request for usb_asic_pwr_en failed\n");
+		printk(KERN_ERR "Gpio request for usb_asic_pwr_en failed\n");
 		return;
 	}
 	gpio_direction_output(186, 1);
@@ -1151,10 +1109,6 @@ static void __init omap3_bug_init(void)
 	batt_gpio_settings();
 	omap3bug_flash_init();
 	omap_init_bmi_slots();
-
-	/* Pin Mux - Set T8 to GPT9_PWM_EVT */
-	// For LED - should probably be moved into uboot
-	//	omap_cfg_reg(T8_34XX_GPIO55_OUT);
 
 }
 

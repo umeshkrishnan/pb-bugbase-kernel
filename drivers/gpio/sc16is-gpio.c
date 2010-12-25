@@ -164,12 +164,12 @@ static int sc16is_gpio_probe(struct platform_device *pdev)
   /* PB-Bugbase*/
   gc = &chip->gpio_chip;
 
-  sc16is_gpio_direction_output(gc, 0, 0);
+  sc16is_gpio_direction_output(gc, 0, 1);
   sc16is_gpio_direction_output(gc, 1, 1);
-  sc16is_gpio_direction_output(gc, 2, 0);
-  sc16is_gpio_direction_output(gc, 3, 0);
-  sc16is_gpio_direction_output(gc, 4, 0);
-  sc16is_gpio_direction_output(gc, 5, 0);
+  sc16is_gpio_direction_output(gc, 2, 1);
+  sc16is_gpio_direction_output(gc, 3, 1);
+  sc16is_gpio_direction_output(gc, 4, 1);
+  sc16is_gpio_direction_output(gc, 5, 1);
   sc16is_gpio_direction_output(gc, 6, 0);
   sc16is_gpio_direction_output(gc, 7, 1);
 

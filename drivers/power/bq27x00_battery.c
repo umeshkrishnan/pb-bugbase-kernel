@@ -158,7 +158,7 @@ static int bq27x00_battery_voltage(struct bq27x00_device_info *di)
  * Note that current can be negative signed as well
  * Or 0 if something fails.
  */
-static signed int bq27x00_battery_current(struct bq27x00_device_info *di)
+static int bq27x00_battery_current(struct bq27x00_device_info *di)
 {
 	int ret;
 	int curr = 0;
@@ -180,7 +180,7 @@ static signed int bq27x00_battery_current(struct bq27x00_device_info *di)
 	if ((flags & (1 << 0)) != 0) {
 //		dev_dbg(di->dev, "negative current!\n");
 //		printk("negative current!\n");
-		return -((~curr +1) & 0x00ff);
+		return -((~curr +1) & 0x7fff);
 	}
 
 	return curr;
@@ -475,8 +475,6 @@ static int bq27200_battery_probe(struct i2c_client *client,
 	di->bus = bus;
 	di->client = client;
 
-	bq27x00_powersupply_init(di);
-
 	/* Read the HW Version */
 	value = i2c_smbus_write_word_data(di->client, 0, 0x0003);
 	if (value < 0)
@@ -518,6 +516,9 @@ static int bq27200_battery_probe(struct i2c_client *client,
 		goto batt_failed_3;
 
 	mdelay (200);
+
+	bq27x00_powersupply_init(di);
+
 
 	retval = power_supply_register(&client->dev, &di->bat);
 	if (retval) {
